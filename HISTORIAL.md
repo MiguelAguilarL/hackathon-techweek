@@ -1,7 +1,7 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
-* **Objetivo actual:** Configuración inicial del entorno y desarrollo de la pantalla de Login basada en la referencia.
+* **Objetivo actual:** Flujo completo de Autenticación, Bienvenida, Evaluación Diagnóstica (6 preguntas de matemáticas) y Resultados.
 * **Fase:** Prototipado / Desarrollo UI (Mobile-First & PWA).
 
 ---
@@ -11,17 +11,23 @@
 hackathon-techweek/
 ├── public/
 ├── references/
-│   └── login.html
+│   ├── evaluacion_diagnostica.html
+│   ├── login.html
+│   └── resultado_evaluacion.html
 ├── src/
 │   ├── assets/
 │   ├── components/
 │   │   └── ConnectivityBanner.jsx
+│   ├── data/
+│   │   └── diagnosticData.js
 │   ├── db/
 │   │   └── index.js
 │   ├── hooks/
 │   │   └── useOnlineStatus.js
 │   ├── pages/
-│   │   └── LoginPage.jsx
+│   │   ├── DiagnosticPage.jsx
+│   │   ├── LoginPage.jsx
+│   │   └── ResultPage.jsx
 │   ├── services/
 │   ├── App.jsx
 │   ├── index.css
@@ -39,23 +45,28 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-### [Iteración 1] - 11/11/2026
+### [Iteración 2] - 11/11/2026
 * **Hecho:** 
-  * Se inicializó el proyecto con Vite, React y Tailwind CSS v4, gestionado con **pnpm**.
-  * Se integró `vite-plugin-pwa` para el soporte offline y Service Worker.
-  * Se añadieron `react-router-dom`, `lucide-react` y `dexie` para persistencia e IndexedDB local.
-  * Se implementó el Hook personalizado `useOnlineStatus` y el componente `ConnectivityBanner` con detección de modo en línea / sin conexión.
-  * Se implementó la pantalla de Login completa en [LoginPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/LoginPage.jsx), reproduciendo con fidelidad el diseño de [references/login.html](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/references/login.html), aplicando las directrices de `AGENTS.md` (mobile-first, targets mínimos de 44px, alternancia de visibilidad de contraseña, selector de rol Estudiante/Docente).
-  * Se verificó la compilación de producción con `pnpm build` de manera exitosa.
+  * Se configuraron credenciales y datos del usuario de prueba (`maria.rodriguez@jarocha.edu.mx` / `123`) con botón de autocompletado en el login.
+  * Se diseñó el modal de bienvenida amigable para cuando el estudiante ingresa por primera vez.
+  * Se creó [DiagnosticPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/DiagnosticPage.jsx) basándose en `references/evaluacion_diagnostica.html`:
+    * 6 preguntas sobre matemáticas básicas (ecuaciones lineales y despejes: 5 de opción múltiple y 1 pregunta explicativa abierta).
+    * Barra de progreso interactiva reactiva en tiempo real.
+    * Persistencia de los resultados tanto en `localStorage` como en `Dexie.js` (IndexedDB) para funcionamiento offline.
+  * Se creó [ResultPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/ResultPage.jsx) basándose en `references/resultado_evaluacion.html`:
+    * Cálculo dinámico de aciertos y nivel de partida (Básico, Intermedio, Avanzado).
+    * Retroalimentación y aspectos a mejorar estructurados.
+    * Opciones para repetir la evaluación o continuar.
+  * Se actualizaron las rutas en [App.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/App.jsx) (`/login`, `/evaluacion`, `/resultado`).
+  * Se comprobó la compilación exitosa con `pnpm build`.
 * **Archivos modificados/creados:**
-  * `vite.config.js`
-  * `src/index.css`
-  * `src/App.jsx`
-  * `src/pages/LoginPage.jsx`
-  * `src/components/ConnectivityBanner.jsx`
-  * `src/hooks/useOnlineStatus.js`
+  * `src/data/diagnosticData.js`
   * `src/db/index.js`
+  * `src/pages/LoginPage.jsx`
+  * `src/pages/DiagnosticPage.jsx`
+  * `src/pages/ResultPage.jsx`
+  * `src/App.jsx`
   * `HISTORIAL.md`
 * **Próximos pasos sugeridos:**
-  * Implementar el flujo de autenticación/sesión local con Dexie.
-  * Diseñar la pantalla principal de selección de temas o chat socrático para el estudiante.
+  * Desarrollar el tutor socrático (chat guiado) que tome como base el diagnóstico obtenido.
+  * Implementar el panel o vista docente para consultar el avance del grupo.
