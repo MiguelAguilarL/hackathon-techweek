@@ -30,4 +30,4 @@ python agente_profesor.py
 ```
 
 Escribe tu petición en lenguaje natural y presiona Enter.
-Escribe `salir` para terminar. Cada respuesta se guarda en `output/`.
+Escribe `salir` para terminar.

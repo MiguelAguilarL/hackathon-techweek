@@ -1,5 +1,4 @@
-# Agente profesor para AULA+ - Paso 4: consola + guardado de respuestas
-import datetime
+# Agente profesor para AULA+ - consola con un solo agente Groq
 import os
 
 from dotenv import load_dotenv
@@ -52,14 +51,6 @@ def generar_respuesta(peticion_del_profesor: str) -> str:
     return respuesta.content
 
 
-def guardar_respuesta(texto: str) -> None:
-    """Guarda la respuesta en output/ con fecha y hora."""
-    os.makedirs("output", exist_ok=True)
-    fecha = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    with open(f"output/{fecha}.md", "w", encoding="utf-8") as archivo:
-        archivo.write(texto)
-
-
 if __name__ == "__main__":
     print("Agente AULA+ (escribe 'salir' para terminar)")
     while True:
@@ -69,6 +60,4 @@ if __name__ == "__main__":
         if not peticion:
             continue
         print("\nAgente >")
-        texto = generar_respuesta(peticion)
-        print(texto)
-        guardar_respuesta(texto)
+        print(generar_respuesta(peticion))
