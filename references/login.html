@@ -1,0 +1,104 @@
+<!DOCTYPE html><html class="h-full bg-slate-50" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Aprender a la jarocha - Evaluación Diagnóstica</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script data-purpose="tailwind-config" id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styles">
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+  </style>
+<meta content="web_dashboard" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"></head>
+<body class="h-full flex flex-col justify-between text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+<header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30" data-purpose="top-navigation">
+<div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+          AJ
+        </div>
+<h1 class="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+          Aprender a la jarocha
+        </h1>
+</div>
+
+</div>
+</header>
+<main class="max-w-7xl w-full mx-auto px-6 py-8 flex-grow"><div class="flex flex-col w-full items-center justify-center min-h-[75vh] px-4">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-xl p-8 space-y-6 relative overflow-hidden">
+<!-- Decorative background glow -->
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -left-24 w-48 h-48 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+<!-- Header Section -->
+<div class="text-center space-y-2 relative z-10">
+<div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary text-on-primary font-headline-lg shadow-md mb-2">
+        AJ
+      </div>
+<h2 class="font-headline-md text-on-surface">Aprender a la jarocha</h2>
+<p class="font-body-md text-on-surface-variant">Bienvenido, inicia sesión para continuar</p>
+</div>
+<!-- Login Form -->
+<form class="space-y-4 relative z-10" onsubmit="event.preventDefault();">
+<div class="space-y-1">
+<label class="block font-label-md text-on-surface" for="email">Correo electrónico</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-lg">mail</span>
+</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low text-on-surface rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" id="email" placeholder="tu.correo@ejemplo.com" required="" type="email">
+</div>
+</div>
+<div class="space-y-1">
+<label class="block font-label-md text-on-surface" for="password">Contraseña</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-lg">lock</span>
+</span>
+<input class="w-full pl-10 pr-10 py-2.5 bg-surface-container-low text-on-surface rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" id="password" placeholder="••••••••" required="" type="password">
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface" onclick="const p = document.getElementById('password'); p.type = p.type === 'password' ? 'text' : 'password';" type="button">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between text-sm py-1">
+<label class="flex items-center space-x-2 cursor-pointer">
+<input class="w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary" type="checkbox">
+<span class="font-label-sm text-on-surface-variant">Recordar datos</span>
+</label>
+
+</div>
+<button class="w-full py-3 px-4 bg-primary text-on-primary font-label-md rounded-lg shadow-md hover:bg-primary-container transition-all flex items-center justify-center space-x-2" type="submit">
+<span>Iniciar sesión</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</form>
+<!-- Footer link -->
+<div class="text-center pt-2 border-t border-surface-container relative z-10">
+
+</div>
+</div>
+</div></main>
+<aside class="fixed bottom-6 right-6 z-40" data-purpose="floating-ai-support">
+
+</aside>
+
+
+</body></html>
