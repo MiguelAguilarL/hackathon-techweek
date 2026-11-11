@@ -2,7 +2,7 @@
 
 ## 📌 Estado General
 * **Objetivo actual:** Agente docente único (consola) que genera evaluaciones diagnósticas y actividades con Groq.
-* **Fase:** MVP funcional en consola — 5 commits realizados; pendiente decidir siguiente funcionalidad.
+* **Fase:** MVP funcional en consola con memoria de conversación — pendiente decidir siguiente funcionalidad.
 
 ---
 
@@ -73,3 +73,16 @@
   * Límite Groq on_demand: 1000 tokens de salida por minuto → evaluaciones muy largas (15 preguntas) pueden quedar truncadas.
   * Sin historial de conversación (cada petición es independiente).
 * **Próximos pasos:** commitear este HISTORIAL + `.env.example`, `.gitignore`, `requirements.txt`; decidir siguiente funcionalidad con el usuario.
+
+### [Iteración 5] - 11/11/2026 — MEMORIA con checkpointer
+* **Hecho:**
+  * Nombre corregido a **Aprender a la Jarocha** (antes decía AULA+).
+  * Agente con memoria de conversación usando `create_agent` + `InMemorySaver` (checkpointer en RAM, un solo `thread_id` "profesor").
+  * `generar_respuesta()` ahora invoca al agente con `config=CONFIG`; se eliminó el manejo manual de `SystemMessage`/`HumanMessage`.
+  * Prueba OK: "2 preguntas más sobre el mismo tema" continuó numeración y formato anteriores.
+* **Archivos modificados:** `agente_profesor.py`, `README.md`
+* **Commits:** `docs: renombrar app a Aprender a la Jarocha`, `feat: agregar memoria al agente con checkpointer`
+* **Limitaciones conocidas:**
+  * La memoria vive en RAM: se pierde al cerrar la consola.
+  * El historial crece en cada turno (más tokens de entrada con el tiempo).
+* **Próximos pasos:** decidir siguiente funcionalidad con el usuario.
