@@ -26,6 +26,10 @@ hackathon-techweek/
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
+├── .env                     ← NUEVO (no se sube al repo)
+├── agente.js                ← NUEVO (traducción a JavaScript de agente.py)
+├── agente.py
+├── ecuaciones_lineales.pdf
 ├── index.html
 ├── package.json
 ├── pnpm-lock.yaml
@@ -59,3 +63,15 @@ hackathon-techweek/
 * **Próximos pasos sugeridos:**
   * Implementar el flujo de autenticación/sesión local con Dexie.
   * Diseñar la pantalla principal de selección de temas o chat socrático para el estudiante.
+
+### [Iteración 2] - 11/11/2026
+* **Hecho:**
+  * Se tradujo el agente tutor de Python (`agente.py`) a JavaScript (`agente.js`) con LangChain.js y Gemini 2.5 Flash, para conectarlo más fácil con la PWA en React.
+  * El agente incluye el system prompt socrático (pistas graduales, metacognición con "¿qué tan seguro estás?", contexto de Veracruz y detección de dudas) y la tool `consultar_material`, que lee el texto de `ecuaciones_lineales.pdf` desde el repo con `unpdf`; la carga desde la plataforma quedó comentada.
+  * Se creó `.env` para la API key de Gemini (`GOOGLE_API_KEY`) y se agregó `.env` a `.gitignore` para no subirla al repo.
+* **Archivos modificados/creados:**
+  * `agente.js`
+  * `.env` (no versionado)
+  * `.gitignore`
+  * `package.json`, `pnpm-lock.yaml` (dependencias: `langchain`, `@langchain/core`, `@langchain/google-genai`, `zod`, `unpdf`)
+  * `HISTORIAL.md`
