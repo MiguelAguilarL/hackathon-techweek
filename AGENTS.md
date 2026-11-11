@@ -4,6 +4,14 @@
 
 ---
 
+## Núcleo del Proyecto: El Reto a Resolver (README.md)
+
+Fuente de la Verdad: La descripción completa, requisitos, objetivos y criterios de evaluación del hackathon se encuentran documentados en el archivo README.md.
+
+Enfoque 100% Alineado: Todo el desarrollo, arquitectura, componentes y decisiones de diseño deben responder estrictamente a resolver el problema planteado en dicho archivo.
+
+Prohibición de Features Innecesarias: Queda terminantemente prohibido sugerir o implementar funcionalidades accesorias que desvíen al equipo del objetivo central definido en el README.md. Cada propuesta de código debe justificar cómo aporta a la solución del reto.
+
 ## 1. Regla de Oro: Gestión de Contexto y Memoria (`HISTORIAL.md`)
 
 Dado que el desarrollo se realiza a través de múltiples sesiones de chat o con límites de contexto de ventana, **es obligatorio mantener y consultar activamente la bitácora del proyecto**.
