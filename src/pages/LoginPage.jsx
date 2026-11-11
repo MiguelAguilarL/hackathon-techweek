@@ -1,23 +1,53 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, KeyRound } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
+import { MOCK_USER } from '../data/diagnosticData';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [role, setRole] = useState('student'); // 'student' | 'teacher'
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const fillMockCredentials = () => {
+    setEmail(MOCK_USER.email);
+    setPassword(MOCK_USER.password);
+    setErrorMsg('');
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Manejo de autenticación local o remota
-    console.log('Login attempt:', { email, role, rememberMe });
+    setErrorMsg('');
+
+    // Validación de usuario de prueba o acceso
+    if (
+      (email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() && password === MOCK_USER.password) ||
+      (email.trim().length > 0 && password.length >= 3)
+    ) {
+      // Guardamos la sesión
+      const userData = {
+        name: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.name : 'Estudiante Jarocho',
+        email: email.trim(),
+        role,
+        initials: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.initials : 'EJ',
+        grade: MOCK_USER.grade,
+        subject: MOCK_USER.subject,
+        firstTime: true
+      };
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      navigate('/evaluacion');
+    } else {
+      setErrorMsg('Credenciales inválidas. Usa las de prueba o escribe una contraseña de al menos 3 dígitos.');
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-800 selection:bg-emerald-500 selection:text-white">
-      {/* Banner de Conectividad (Requerimiento de baja conexión) */}
+      {/* Banner de Conectividad */}
       <ConnectivityBanner />
 
       {/* Header Superior */}
@@ -42,11 +72,11 @@ export default function LoginPage() {
       {/* Contenido Principal */}
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-grow flex items-center justify-center">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sm:p-8 space-y-6 relative overflow-hidden">
-          {/* Destellos decorativos de fondo sutiles */}
+          {/* Destellos decorativos */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-100/60 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-teal-100/60 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Encabezado del Formulario */}
+          {/* Encabezado */}
           <div className="text-center space-y-2 relative z-10">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-md mb-1">
               AJ
@@ -59,12 +89,13 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Selector de Rol: Estudiante / Docente */}
+
+          {/* Selector de Rol */}
           <div className="relative z-10 grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl">
             <button
               type="button"
               onClick={() => setRole('student')}
-              className={`min-h-[44px] py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              className={`min-h-[44px] py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 role === 'student'
                   ? 'bg-white text-emerald-800 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -76,7 +107,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setRole('teacher')}
-              className={`min-h-[44px] py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              className={`min-h-[44px] py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 role === 'teacher'
                   ? 'bg-white text-emerald-800 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -86,9 +117,14 @@ export default function LoginPage() {
             </button>
           </div>
 
+          {errorMsg && (
+            <div className="p-3 text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg">
+              {errorMsg}
+            </div>
+          )}
+
           {/* Formulario */}
           <form className="space-y-4 relative z-10" onSubmit={handleSubmit}>
-            {/* Campo Correo */}
             <div className="space-y-1.5">
               <label
                 className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
@@ -112,7 +148,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Campo Contraseña */}
             <div className="space-y-1.5">
               <label
                 className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
@@ -137,14 +172,13 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 min-w-[44px] justify-center transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 min-w-[44px] justify-center transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Recordar datos */}
             <div className="flex items-center justify-between text-xs py-1">
               <label className="flex items-center space-x-2 cursor-pointer select-none">
                 <input
@@ -157,7 +191,6 @@ export default function LoginPage() {
               </label>
             </div>
 
-            {/* Botón de Enviar (mínimo 44px de alto para uso móvil fácil) */}
             <button
               type="submit"
               className="w-full min-h-[48px] py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-medium rounded-xl shadow-md shadow-emerald-700/20 transition-all flex items-center justify-center space-x-2 cursor-pointer text-sm"
@@ -167,7 +200,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Pie de pantalla y aviso sin conexión */}
           <div className="pt-2 border-t border-slate-100 text-center relative z-10">
             <p className="text-xs text-slate-400">
               {role === 'student'

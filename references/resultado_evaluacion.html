@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-slate-50" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aprender a la jarocha - Evaluación Diagnóstica</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script data-purpose="tailwind-config" id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styles">
+    /* Custom font smoothing and transitions */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+  </style>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head>
+<body class="h-full flex flex-col justify-between text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+<!-- BEGIN: MainHeader -->
+<header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30" data-purpose="top-navigation">
+<div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<!-- App Title -->
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+          AJ
+        </div>
+<h1 class="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+          Aprender a la jarocha
+        </h1>
+</div>
+<!-- Online Status Indicator -->
+<div class="flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+</span>
+<span class="text-xs font-semibold tracking-wider text-emerald-800 uppercase">ONLINE</span>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContentContainer -->
+<main class="max-w-7xl w-full mx-auto px-6 py-8 flex-grow"><div class="flex flex-col w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Sidebar: Student Information Card -->
+<div class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 shadow-sm flex flex-col space-y-6">
+<div class="flex items-center space-x-4 pb-6 border-b border-surface-container">
+<div class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md shadow-md">
+          MR
+        </div>
+<div>
+<span class="text-body-sm text-on-surface-variant uppercase tracking-wider font-label-sm">Nombre estudiante</span>
+<h2 class="text-headline-sm text-on-surface">María Rodríguez</h2>
+<span class="inline-block mt-1 text-xs px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm">Estudiante Active</span>
+</div>
+</div>
+<div class="space-y-4">
+<div>
+<span class="text-body-sm text-on-surface-variant uppercase tracking-wider font-label-sm block">Materia</span>
+<p class="text-body-md font-label-md text-on-surface">Matemáticas Aplicadas</p>
+</div>
+<div>
+<span class="text-body-sm text-on-surface-variant uppercase tracking-wider font-label-sm block">Grado y grupo</span>
+<p class="text-body-md font-label-md text-on-surface">3° "B" Secundaria</p>
+</div>
+<div>
+<span class="text-body-sm text-on-surface-variant uppercase tracking-wider font-label-sm block">Tu nivel de aprendizaje</span>
+<div class="mt-1 flex items-center space-x-2">
+<div class="flex-1 bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 70%"></div>
+</div>
+<span class="text-body-md font-headline-sm text-primary">Intermedio</span>
+</div>
+</div>
+</div>
+<div class="pt-4 bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex items-center space-x-3">
+<div class="p-2 rounded-lg bg-primary-container text-on-primary-container">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<h4 class="text-body-md font-headline-sm text-on-surface">Evaluación Completada</h4>
+<p class="text-body-sm text-on-surface-variant">Revisión diagnóstica finalizada con éxito.</p>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="lg:col-span-8 flex flex-col space-y-6">
+<!-- Top Title Card -->
+<div class="bg-surface-container-low rounded-xl p-8 shadow-sm text-center">
+<span class="text-xs uppercase tracking-widest text-primary font-label-sm">Diagnóstico Inicial</span>
+<h1 class="text-headline-md text-on-surface mt-1">Resultado de Evaluación Diagnóstica</h1>
+<!-- Score Box -->
+<div class="mt-6 inline-flex items-center space-x-4 bg-surface-container-lowest px-8 py-4 rounded-xl shadow-sm border border-surface-container">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-headline-md">
+            8
+          </div>
+<div class="text-left">
+<span class="text-body-sm text-on-surface-variant block uppercase font-label-sm">Puntuación total</span>
+<span class="text-headline-md text-on-surface">Aciertos: 8 / 10</span>
+</div>
+</div>
+</div>
+<!-- Aspectos a mejorar -->
+<div class="bg-surface-container-low rounded-xl p-8 shadow-sm">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-8 h-8 rounded-lg bg-tertiary-container text-on-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<h2 class="text-headline-sm text-on-surface">Aspectos a mejorar</h2>
+</div>
+<p class="text-body-md text-on-surface-variant leading-relaxed">
+          Tus aspectos a mejorar son el desarrollo de identidades trigonométricas avanzadas y el despeje de incógnitas en ecuaciones con fracciones complejas. Puedes hacer ejercicios prácticos adicionales en la sección de recursos para mejorar en estas áreas clave.
+        </p>
+</div>
+<!-- Retroalimentación -->
+<div class="bg-surface-container-low rounded-xl p-8 shadow-sm">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<h2 class="text-headline-sm text-on-surface">Retroalimentación</h2>
+</div>
+<p class="text-body-md text-on-surface-variant leading-relaxed">
+          Retroalimentación: Buen desempeño general en álgebra y simplificación de expresiones. Demuestras excelente lógica matemática básica, sin embargo, se recomienda repasar factorización y leyes de exponentes para consolidar tu nivel intermedio antes de pasar al siguiente módulo.
+        </p>
+</div>
+<!-- Primary Action Button -->
+<div class="pt-4 flex justify-center">
+<button class="w-full sm:w-auto px-10 py-4 bg-primary text-on-primary font-headline-sm rounded-xl shadow-lg hover:bg-primary-container hover:shadow-xl transition-all flex items-center justify-center space-x-3" onclick="window.location.href='#'">
+<span>Continuar al Dashboard</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div></main>
+<!-- END: MainContentContainer -->
+<!-- BEGIN: AIAssistantWidget -->
+<aside class="fixed bottom-6 right-6 z-40" data-purpose="floating-ai-support">
+<div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 flex items-center space-x-3 hover:shadow-2xl transition-all cursor-pointer group">
+<div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<span class="block text-xs text-slate-400 font-medium">¿Tienes dudas?</span>
+<span class="text-sm font-bold text-slate-800 group-hover:text-teal-600 transition-colors">Chat IA apoyo</span>
+</div>
+</div>
+</aside>
+<!-- END: AIAssistantWidget -->
+<!-- BEGIN: InteractiveScript -->
+<script data-purpose="progress-calculator">
+    function updateProgress() {
+      const q1Answered = document.querySelector('input[name="q1"]:checked') !== null;
+      const q2Input = document.getElementById('q2-input');
+      const q2Answered = q2Input.value.trim().length > 0;
+      
+      let answeredCount = 0;
+      if (q1Answered) answeredCount++;
+      if (q2Answered) answeredCount++;
+      
+      const totalQuestions = 2;
+      const percentage = Math.round((answeredCount / totalQuestions) * 100);
+      
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-percentage');
+      
+      progressBar.style.width = percentage + '%';
+      progressText.textContent = percentage + '%';
+    }
+  </script>
+<!-- END: InteractiveScript -->
+</body></html>
