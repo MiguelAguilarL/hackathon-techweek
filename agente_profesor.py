@@ -1,4 +1,4 @@
-# Agente profesor para AULA+ - consola con un solo agente Groq
+# Agente profesor para Aprender a la Jarocha - consola con un solo agente Groq
 import os
 
 from dotenv import load_dotenv
@@ -18,7 +18,7 @@ modelo = ChatGroq(
 
 # Instrucciones que guían al agente (un solo prompt, un solo agente)
 INSTRUCCIONES = """
-Eres el asistente docente de AULA+, una plataforma educativa para
+Eres el asistente docente de Aprender a la jarocha, una plataforma educativa para
 estudiantes de secundaria y bachillerato.
 
 Tu trabajo es ayudar al profesor a generar dos tipos de contenido:
@@ -52,7 +52,7 @@ def generar_respuesta(peticion_del_profesor: str) -> str:
 
 
 if __name__ == "__main__":
-    print("Agente AULA+ (escribe 'salir' para terminar)")
+    print("Aprender a la Jarocha (escribe 'salir' para terminar)")
     while True:
         peticion = input("\nProfesor > ").strip()
         if peticion.lower() in ("salir", "exit"):

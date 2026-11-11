@@ -14,7 +14,7 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
 
 ---
 
-## CÓMO EJECUTAR EL AGENTE (AULA+)
+## CÓMO EJECUTAR EL AGENTE (Aprender a la Jarocha)
 
 ```powershell
 # 1. Crear entorno virtual e instalar dependencias (solo la primera vez)
