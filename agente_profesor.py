@@ -2,8 +2,9 @@
 import os
 
 from dotenv import load_dotenv
+from langchain.agents import create_agent
 from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage, SystemMessage
+from langgraph.checkpoint.memory import InMemorySaver
 
 # Cargar la clave GROQ_API_KEY desde el archivo .env
 load_dotenv()
@@ -41,14 +42,24 @@ Reglas:
 - Responde en español.
 """
 
+# Un solo agente con memoria: el checkpointer recuerda la conversación
+agente = create_agent(
+    model=modelo,
+    system_prompt=INSTRUCCIONES,
+    checkpointer=InMemorySaver(),
+)
+
+# Mismo "hilo" de conversación durante toda la sesión
+CONFIG = {"configurable": {"thread_id": "profesor"}}
+
+
 def generar_respuesta(peticion_del_profesor: str) -> str:
-    """Envía la petición del profesor al modelo y regresa el texto."""
-    mensajes = [
-        SystemMessage(content=INSTRUCCIONES),
-        HumanMessage(content=peticion_del_profesor),
-    ]
-    respuesta = modelo.invoke(mensajes)
-    return respuesta.content
+    """Envía la petición al agente (que recuerda lo anterior) y regresa el texto."""
+    resultado = agente.invoke(
+        {"messages": [{"role": "user", "content": peticion_del_profesor}]},
+        config=CONFIG,
+    )
+    return resultado["messages"][-1].content
 
 
 if __name__ == "__main__":
