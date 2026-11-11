@@ -50,5 +50,12 @@ def generar_respuesta(peticion_del_profesor: str) -> str:
     return respuesta.content
 
 if __name__ == "__main__":
-    peticion = "Di hola en una sola línea"
-    print(generar_respuesta(peticion))
+    print("Agente AULA+ (escribe 'salir' para terminar)")
+    while True:
+        peticion = input("\nProfesor > ").strip()
+        if peticion.lower() in ("salir", "exit"):
+            break
+        if not peticion:
+            continue
+        print("\nAgente >")
+        print(generar_respuesta(peticion))
