@@ -28,26 +28,68 @@ Al completar cualquier cambio relevante (creación de archivos, refactorizacione
 
 ---
 
-## 2. Stack Tecnológico y Reglas de UI
+## 2. Stack Tecnológico, Arquitectura y Reglas de UI
 
-El proyecto utiliza un stack frontend moderno y estandarizado:
+El proyecto utiliza un stack frontend orientado a **PWA (Progressive Web App)**, optimizado para teléfonos de recursos limitados, baja latencia y funcionamiento sin conexión:
 
-| Área | Tecnología |
-| :--- | :--- |
-| **Framework base** | Next.js (App Router recomendado) |
-| **Librería de UI** | React |
-| **Estilos** | Tailwind CSS |
-| **Rutas y Paginación** | Next.js Routing (`next/navigation`, `Link`, parámetros de búsqueda `useSearchParams`) |
+| Área | Tecnología | Justificación |
+| :--- | :--- | :--- |
+| **Tooling & Build** | Vite | Bundle ultra liviano, tiempos de compilación mínimos y soporte nativo para ES Modules. |
+| **Librería de UI** | React | Desarrollo declarativo basado en componentes y hooks reutilizables. |
+| **Estilos** | Tailwind CSS | Clases utilitarias puras que reducen el tamaño final del CSS al eliminar reglas no usadas. |
+| **Capacidades PWA** | `vite-plugin-pwa` (Workbox) | Gestión automatizada de Service Workers, caché de cascarón (app shell) y manifiesto web. |
+| **Persistencia Local** | Dexie.js (IndexedDB) | Base de datos local reactiva y transaccional para chats, temas y cola de sincronización. |
+| **Enrutamiento** | React Router (`react-router-dom`) | Navegación en el cliente sin recargas de página ni consumo adicional de red. |
+| **Iconografía** | Lucide React | Paquete optimizado con tree-shaking mediante imports nombrados. |
+
+---
 
 ### Reglas de Desarrollo de UI:
-* **Paginación y Enrutamiento:** Toda la navegación entre vistas y paginación de datos debe resolverse usando las utilidades nativas de Next.js (`Link`, rutas dinámicas `[page]` o search params `?page=1`). No usar routers de terceros.
-* **Componentes:**
-  * Usar componentes funcionales y Hooks modernos.
-  * Modularizar la UI en componentes reutilizables (`/components`).
-* **Estilos:**
-  * Usar exclusivamente clases utilitarias de **Tailwind CSS**.
-  * Evitar archivos `.css` adicionales salvo configuraciones globales mínimas (`globals.css`).
-  * Diseñar siempre con enfoque *Mobile First* y diseño responsivo.
+
+- **Enfoque Mobile-First Obligatorio:**
+  - Toda pantalla se diseña partiendo de resoluciones base móviles (360px–420px de ancho).
+  - Todo elemento táctil (botones, inputs, chips de respuesta) debe cumplir un área de contacto mínima de **44×44 px**.
+  - Interacciones clave concentradas en la zona inferior de la pantalla para permitir uso cómodo con una sola mano.
+
+- **Optimización para Baja Conexión y Rendimiento:**
+  - **Zero Heavy Assets:** Queda prohibido el uso de imágenes pesadas, gifs o librerías de animación complejas; priorizar fuentes tipográficas del sistema (`font-sans`).
+  - **Indicador de Conectividad:** La interfaz debe integrar un banner o etiqueta sutil que notifique claramente si la app está en modo *Conectado* o *Sin conexión (Guardando localmente)*.
+  - **Actualizaciones Optimistas:** El contenido generado por el estudiante (mensajes, intentos, selecciones) debe mostrarse al instante en pantalla antes de sincronizarse con la red.
+
+- **Diseño del Chat y Tutor Socrático:**
+  - Flujo visual estilo mensajería rápida con burbujas legibles y contrastes de color accesibles (WCAG AA).
+  - Integración de botones de acción rápida (*quick reply chips*) para estructurar el razonamiento del alumno sin exigir tecleo excesivo en pantallas pequeñas.
+
+- **Componentes y Modularidad:**
+  - Uso exclusivo de componentes funcionales y Hooks personalizados (`useOnlineStatus`, `useLiveQuery`).
+  - Desacoplamiento total entre las interfaces del alumno y el panel de seguimiento docente.
+
+- **Estilos:**
+  - Uso estricto de clases de utilidad de **Tailwind CSS**.
+  - Evitar archivos de estilos personalizados; centralizar configuraciones mínimas en `index.css`.
+
+---
+
+### Estructura de Directorios del Proyecto
+
+```text
+aprender-a-la-jarocha/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── db/
+│   ├── hooks/
+│   ├── pages/
+│   ├── services/
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── index.html
+├── package.json
+├── tailwind.config.js
+└── vite.config.js
+```
 
 ---
 
@@ -75,18 +117,7 @@ El agente debe inicializar o verificar que `HISTORIAL.md` siga esta estructura:
 
 ---
 
-## 🌳 Estructura Actual del Proyecto
-\`\`\`text
-proyecto/
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── pagination/
-├── components/
-├── public/
-├── AGENTS.md
-└── HISTORIAL.md
-\`\`\`
+
 
 ---
 
