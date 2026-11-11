@@ -1,4 +1,5 @@
-# Agente profesor para AULA+ - Paso 2: instrucciones del agente
+# Agente profesor para AULA+ - Paso 4: consola + guardado de respuestas
+import datetime
 import os
 
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ modelo = ChatGroq(
     model="qwen/qwen3.8-27b",
     api_key=os.environ["GROQ_API_KEY"],
     temperature=0.4,
+    max_tokens=1000,  # límite del plan on_demand de Groq
 )
 
 # Instrucciones que guían al agente (un solo prompt, un solo agente)
@@ -49,6 +51,15 @@ def generar_respuesta(peticion_del_profesor: str) -> str:
     respuesta = modelo.invoke(mensajes)
     return respuesta.content
 
+
+def guardar_respuesta(texto: str) -> None:
+    """Guarda la respuesta en output/ con fecha y hora."""
+    os.makedirs("output", exist_ok=True)
+    fecha = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    with open(f"output/{fecha}.md", "w", encoding="utf-8") as archivo:
+        archivo.write(texto)
+
+
 if __name__ == "__main__":
     print("Agente AULA+ (escribe 'salir' para terminar)")
     while True:
@@ -58,4 +69,6 @@ if __name__ == "__main__":
         if not peticion:
             continue
         print("\nAgente >")
-        print(generar_respuesta(peticion))
+        texto = generar_respuesta(peticion)
+        print(texto)
+        guardar_respuesta(texto)
