@@ -1,4 +1,5 @@
 # Agente profesor para Aprender a la Jarocha - consola con un solo agente Groq
+import json
 import os
 
 from dotenv import load_dotenv
@@ -102,6 +103,18 @@ def mostrar_en_pantalla(contenido: dict) -> None:
             print(f"   Dificultad: {p['dificultad']}")
 
 
+def guardar_json(contenido: dict) -> None:
+    """Guarda el diccionario en output/contenido_N.json (numerado, sin sobreescribir)."""
+    os.makedirs("output", exist_ok=True)
+    numero = 1
+    while os.path.exists(f"output/contenido_{numero}.json"):
+        numero += 1
+    ruta = f"output/contenido_{numero}.json"
+    with open(ruta, "w", encoding="utf-8") as archivo:
+        json.dump(contenido, archivo, ensure_ascii=False, indent=2)
+    print(f"\n[guardado en {ruta}]")
+
+
 if __name__ == "__main__":
     print("Aprender a la Jarocha (escribe 'salir' para terminar)")
     while True:
@@ -113,3 +126,5 @@ if __name__ == "__main__":
         contenido = generar_respuesta(peticion)
         print("\nAgente >")
         mostrar_en_pantalla(contenido)
+        if contenido["estado"] == "generado":
+            guardar_json(contenido)
