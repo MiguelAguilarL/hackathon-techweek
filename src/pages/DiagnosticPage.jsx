@@ -119,10 +119,10 @@ export default function DiagnosticPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-              AJ
+              JA
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-              Aprender a la jarocha
+              Jarocha AI
             </h1>
           </div>
 
@@ -295,7 +295,7 @@ export default function DiagnosticPage() {
               </h2>
 
               <p className="text-sm text-slate-600 leading-relaxed text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
-                Esta es tu primera vez en <strong>Aprender a la jarocha</strong>. Para que tu tutor personalizado se adapte a tu ritmo y estilo de aprendizaje, realizaremos tu <strong>evaluación diagnóstica</strong> con reactivos de opción múltiple.
+                Esta es tu primera vez en <strong>Jarocha AI</strong>. Para que tu tutor personalizado se adapte a tu ritmo y estilo de aprendizaje, realizaremos tu <strong>evaluación diagnóstica</strong> con reactivos de opción múltiple.
               </p>
 
               <div className="space-y-2 text-xs text-slate-500 text-left pt-1">

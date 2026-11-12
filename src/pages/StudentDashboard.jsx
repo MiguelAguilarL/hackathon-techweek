@@ -84,10 +84,10 @@ export default function StudentDashboard() {
             </button>
 
             <div className="w-10 h-10 rounded-xl bg-[#006948] flex items-center justify-center text-white font-bold text-xl shadow-md">
-              AJ
+              JA
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-[#006948] to-[#00855d] bg-clip-text text-transparent">
-              Aprender a la jarocha
+              Jarocha AI
             </h1>
           </div>
 
@@ -367,7 +367,7 @@ export default function StudentDashboard() {
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-slate-400 bg-white border-t border-slate-100">
-        <p>&copy; {new Date().getFullYear()} Aprender a la jarocha &bull; Educación accesible sin conexión</p>
+        <p>&copy; {new Date().getFullYear()} Jarocha AI &bull; Educación accesible sin conexión</p>
       </footer>
     </div>
   );

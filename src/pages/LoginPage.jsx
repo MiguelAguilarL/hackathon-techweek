@@ -99,11 +99,11 @@ export default function LoginPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-              AJ
+              JA
             </div>
             <div>
               <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-                Aprender a la jarocha
+                Jarocha AI
               </h1>
               <p className="text-[11px] text-slate-500 leading-none hidden sm:block">
                 Tutor Socrático de Veracruz
@@ -123,10 +123,10 @@ export default function LoginPage() {
           {/* Encabezado */}
           <div className="text-center space-y-2 relative z-10">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-md mb-1">
-              AJ
+              JA
             </div>
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Aprender a la jarocha
+              Jarocha AI
             </h2>
             <p className="text-sm text-slate-500">
               Bienvenido, inicia sesión como {role === 'student' ? 'estudiante' : 'docente'}
@@ -256,7 +256,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-slate-400">
-        <p>&copy; {new Date().getFullYear()} Aprender a la jarocha &bull; Educación accesible sin conexión</p>
+        <p>&copy; {new Date().getFullYear()} Jarocha AI &bull; Educación accesible sin conexión</p>
       </footer>
     </div>
   );
