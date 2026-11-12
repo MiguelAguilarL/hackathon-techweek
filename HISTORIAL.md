@@ -45,7 +45,7 @@ hackathon-techweek/
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
-├── agente.py                  # Agente Socrático LangChain + Groq (intacto)
+├── agente.py                  # Tutor: explicación + booleano intento_copiar
 ├── agente_flashcards.py       # Agente especializado en Flashcards
 ├── agente_profesor.py         # Agente de cuestionarios para el estudiante (ecuaciones de primer grado)
 ├── server.py                  # API FastAPI puente
@@ -72,4 +72,20 @@ hackathon-techweek/
 * **Archivos modificados:**
   * `src/components/SocraticChatModal.jsx`
   * `src/pages/StudentDashboard.jsx`
+  * `HISTORIAL.md`
+
+### [Iteración 12] - 12/11/2026
+* **Hecho:**
+  * Se anotaron en la bitácora de IA del `README.md` los ajustes del tutor que no estaban registrados: el cambio de modelo a Groq, la restauración de `.gitignore` y el system prompt de `agente.py` que exige justificación de cada paso.
+* **Archivos modificados:**
+  * `README.md`
+  * `HISTORIAL.md`
+
+### [Iteración 14] - 12/11/2026
+* **Hecho:**
+  * `responder` en `agente.py` regresa la explicación y el booleano `intento_copiar`.
+  * Se eliminó `consultar_material` y el código comentado de PDFs en Vercel Blob.
+* **Archivos modificados:**
+  * `agente.py`
+  * `README.md`
   * `HISTORIAL.md`

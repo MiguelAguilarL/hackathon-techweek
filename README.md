@@ -229,3 +229,40 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `src/components/SocraticChatModal.jsx`
   * `src/pages/StudentDashboard.jsx`
   * `HISTORIAL.md`
+
+### [Iteración 12] - 11/11/2026
+* **Hecho:**
+  * Se ajustó el system prompt de `agente.py` para que el tutor use el perfil que ya trae el contexto (nombre, grado, materia, ciudad y nivel) y no lo vuelva a preguntar.
+  * Las explicaciones de un concepto usan otros números y otra situación, sin reutilizar los ejercicios del material ni los de la evaluación diagnóstica.
+  * La metacognición deja de anunciar el veredicto antes de que el alumno compruebe: ante un intento responde en neutro y, si el paso está mal, señala ese paso y pregunta para corregirlo.
+  * Cuando el alumno ya comprobó, relaciona una sola vez su seguridad con el acierto (seguro y correcto, seguro e incorrecto, inseguro y correcto, inseguro e incorrecto).
+  * El modelo pasó de Gemini a Groq, `qwen/qwen3.8-27b`, con temperatura 0.1.
+  * Se restauró `.gitignore` para excluir `node_modules`, `__pycache__` y `.env`.
+* **Archivos modificados:**
+  * `agente.py`
+  * `.gitignore`
+* **Próximos pasos sugeridos:**
+  * Exigir que el alumno justifique cada paso antes de avanzar.
+
+### [Iteración 13] - 11/11/2026
+* **Hecho:**
+  * Se reescribió el system prompt de `agente.py` para que el objetivo sea entender el procedimiento y justificar cada paso.
+  * Cada indicación incluye qué hacer, cómo hacerlo (con otros números) y por qué funciona.
+  * El tutor dice de inmediato si el paso es correcto o incorrecto. Si está mal, nombra el error y la regla, y no da el resultado.
+  * Si el error se repite, sube la escalera de ayuda; el ejemplo resuelto sigue siendo de un problema parecido, nunca el del alumno.
+  * Después de cada paso pide la justificación y no avanza sin ella. No pregunta "¿qué tan seguro estás?". Si la razón es vaga o repite la pista, pide que la complete con sus palabras.
+  * Al cerrar el ejercicio, el alumno comprueba su resultado y explica cómo lo comprobó.
+* **Archivos modificados:**
+  * `agente.py`
+* **Próximos pasos sugeridos:**
+  * Registrar pistas, tipo de error y acierto para distinguir práctica con ayuda de un tema dominado.
+
+### [Iteración 14] - 12/11/2026
+* **Hecho:**
+  * `agente.py` devuelve dos valores: `explicacion` (el mensaje para el alumno) e `intento_copiar` (true solo si pidió el resultado, pidió que se lo resuelvan o pegó el ejercicio para que el tutor lo hiciera).
+  * El mensaje final del tutor es un JSON con esos dos campos. `responder` los separa en una cadena y un booleano.
+  * Se quitó la herramienta `consultar_material` y el código comentado que leía PDFs subidos a Vercel Blob.
+* **Archivos modificados:**
+  * `agente.py`
+  * `README.md`
+  * `HISTORIAL.md`

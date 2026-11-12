@@ -1,14 +1,10 @@
+import json
 from dataclasses import dataclass
-from pathlib import Path
-# from io import BytesIO
-# from urllib.request import urlopen
 
 from dotenv import load_dotenv
 from langchain.agents import create_agent
-from langchain.tools import tool, ToolRuntime
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_groq import ChatGroq
-from pypdf import PdfReader
 
 load_dotenv()
 
@@ -20,7 +16,7 @@ Tu objetivo NO es dar respuestas: es que el alumno ENTIENDA el procedimiento y s
 - Nunca resuelvas por el alumno los ejercicios, tareas o exámenes que traiga para estudiar.
 - Si insiste o dice que "solo quiere la respuesta", responde con claridad y sin rodeos: no se la vas a dar, y explica en una frase por qué (si llega él, la recordará).
 - Sí explicas CONCEPTOS y PROCEDIMIENTOS. Lo que no haces es ejecutarlos sobre su ejercicio.
-- Para explicar, usa un ejemplo con otros números y otra situación, nunca los ejercicios del material ni los de su evaluación.
+- Para explicar, usa un ejemplo con otros números y otra situación, nunca los ejercicios de su evaluación.
 
 ## 2. Cómo explicas
 Sé claro y directo. Cada vez que le indiques un paso, incluye siempre tres cosas:
@@ -56,22 +52,19 @@ Ejemplo de la forma, no de contenido: en lugar de "resta 3", explica "para quita
 - Si detectas una idea equivocada, nómbrala directamente, explica por qué es incorrecta y da la idea correcta.
 - Después de explicar un concepto, comprueba que entendió pidiéndole que lo explique con sus palabras o lo aplique a un caso nuevo.
 
-## 6. Uso de la herramienta `consultar_material`
-- Úsala cuando el alumno mencione sus apuntes, su clase o el material, o cuando empiece un tema nuevo y necesites saber cómo lo explicó su profesor.
-- Llámala UNA sola vez por tema; si ya tienes el material en la conversación, reutilízalo.
-- Usa la misma notación y los mismos pasos del material.
-- Puedes proponer los ejercicios del material para practicar, sin dar sus soluciones y sin reutilizar sus números en tus ejemplos.
-
-## 7. Estilo
-- Responde siempre en español, con un tono claro, firme y respetuoso. Eres directo, no frío.
+## 6. Estilo
+- El texto de "explicacion" va en español, con un tono claro, firme y respetuoso. Eres directo, no frío.
 - Evita las felicitaciones exageradas y los rodeos. Reconoce lo correcto en una frase.
-- Mensajes de 3 a 6 líneas. Si la explicación lo requiere, puedes extenderte un poco, pero ordenada en pasos.
+- Esa explicación cabe en 3 a 6 líneas. Si hace falta, un poco más, ordenada en pasos.
 - Haz UNA sola pregunta por mensaje.
 - Un error se corrige con precisión, sin hacer sentir mal al alumno.
-"""
 
-RUTA_PDF_DEMO = Path(__file__).parent / "ecuaciones_lineales.pdf"
-cache_texto = {}
+## 7. Formato de salida
+Tu mensaje final es únicamente este JSON, sin texto alrededor ni markdown:
+{"explicacion": "...", "intento_copiar": false}
+- "explicacion" es el mensaje que ve el alumno.
+- "intento_copiar" es true solo si pidió el resultado, pidió que se lo resuelvas, o pegó el ejercicio para que tú lo hagas. En cualquier otro caso es false.
+"""
 
 
 @dataclass
@@ -79,77 +72,33 @@ class Contexto:
     materia: str
 
 
-def limpiar(texto: str) -> str:
-    lineas = [linea.strip() for linea in texto.splitlines()]
-    return "\n".join(linea for linea in lineas if linea)
-
-
-def leer_pdf(clave: str, abrir) -> str:
-    if clave not in cache_texto:
-        lector = PdfReader(abrir())
-        texto = "\n".join(pagina.extract_text() or "" for pagina in lector.pages)
-        cache_texto[clave] = limpiar(texto)
-    return cache_texto[clave]
-
-
-def obtener_material_demo() -> dict | None:
-    if not RUTA_PDF_DEMO.exists():
-        return None
-    texto = leer_pdf(str(RUTA_PDF_DEMO), lambda: RUTA_PDF_DEMO)
-    return {"nombre": RUTA_PDF_DEMO.name, "texto": texto}
-
-
-# Producción: PDFs que el maestro sube a Vercel Blob
-# def obtener_material_vercel(materia: str, tema: str) -> dict | None:
-#     url = buscar_url_material(materia, tema)  # URL del PDF en Vercel Blob guardada al subirlo
-#     if url is None:
-#         return None
-#     texto = leer_pdf(url, lambda: BytesIO(urlopen(url).read()))
-#     return {"nombre": Path(url).name, "texto": texto}
-
-
-@tool
-def consultar_material(tema: str, runtime: ToolRuntime[Contexto]) -> str:
-    """Consulta los apuntes y materiales que el profesor subió a la plataforma para la materia del alumno.
-
-    Úsala SOLO cuando:
-    - El alumno mencione sus apuntes, su clase, el material, el PDF o "lo que vimos con el profe".
-    - El alumno empiece a estudiar un tema nuevo y necesites saber cómo se explicó en clase
-      (definiciones, procedimiento, notación y ejercicios que usa su profesor).
-
-    NO la uses cuando:
-    - Ya consultaste ese mismo tema antes en la conversación: reutiliza lo que ya tienes en el historial.
-    - El alumno solo saluda, platica o hace una pregunta general que puedes responder sin el material.
-
-    Args:
-        tema: tema o palabra clave del material a buscar, por ejemplo "ecuaciones lineales".
-    """
-    materia = runtime.context.materia
-    print(f"[tool] consultar_material -> {materia} / {tema}")
-
-    material = obtener_material_demo()
-    # material = obtener_material_vercel(materia, tema)
-
-    if material is None:
-        return f"No se encontró material de {materia} sobre '{tema}'."
-
-    return f"""
-MATERIAL DE LA PLATAFORMA (archivo: {material["nombre"]})
-Uso interno del tutor: alinea tus pistas con la notación y el procedimiento del profesor.
-No le des al alumno las soluciones de los ejercicios; úsalos para practicar con pistas.
-
-{material["texto"]}
-"""
-
-
-llm = ChatGroq(model="qwen/qwen3.8-27b", temperature=0.1,max_tokens=1000)
+llm = ChatGroq(model="qwen/qwen3.8-27b", temperature=0.1, max_tokens=1000)
 agente = create_agent(
     model=llm,
-    tools=[consultar_material],
+    tools=[],
     system_prompt=SYSTEM_PROMPT,
     context_schema=Contexto,
-    
 )
+
+
+def leer_respuesta(texto: str) -> tuple[str, bool]:
+    """Separa el JSON final en la explicación y el booleano de copia."""
+    limpio = texto.strip()
+    if limpio.startswith("```"):
+        limpio = limpio.strip("`").strip()
+        if limpio.lower().startswith("json"):
+            limpio = limpio[4:].strip()
+    inicio = limpio.find("{")
+    fin = limpio.rfind("}")
+    datos = json.loads(limpio[inicio : fin + 1])
+    return str(datos["explicacion"]), bool(datos["intento_copiar"])
+
+
+def responder(historial, contexto) -> tuple[str, bool]:
+    """Devuelve la explicación para el alumno y si intentó obtener la respuesta."""
+    respuesta = agente.invoke({"messages": historial}, context=contexto)
+    return leer_respuesta(respuesta["messages"][-1].text)
+
 
 if __name__ == "__main__":
     contexto_alumno = Contexto(materia="matematicas")
@@ -159,6 +108,14 @@ if __name__ == "__main__":
         if pregunta.lower() == "salir":
             break
         historial.append(HumanMessage(content=pregunta))
-        respuesta = agente.invoke({"messages": historial}, context=contexto_alumno)
-        historial = respuesta["messages"]
-        print(f"Agente: {historial[-1].text}")
+        explicacion, intento_copiar = responder(historial, contexto_alumno)
+        historial.append(
+            AIMessage(
+                content=json.dumps(
+                    {"explicacion": explicacion, "intento_copiar": intento_copiar},
+                    ensure_ascii=False,
+                )
+            )
+        )
+        print(f"Agente: {explicacion}")
+        print(f"intento_copiar: {intento_copiar}")
