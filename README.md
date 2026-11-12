@@ -1,4 +1,4 @@
-# RETO: APRENDER A LA JAROCHA
+# RETO: APRENDER A LA JAROCHA (JAROCHA AI)
 
 ### EL PROBLEMA
 
@@ -6,12 +6,133 @@ Muchas y muchos estudiantes de secundaria y bachillerato en Veracruz estudian co
 
 ### LO QUE BUSCAMOS
 
-Un tutor o herramienta educativa que ayude a aprender de verdad, no a copiar: que pregunte antes de responder, se adapte al nivel, funcione bien en celular y con poca conexión, y le dé al docente una vista útil del avance del grupo.
+Un tutor y herramienta educativa que ayude a aprender de verdad, no a copiar: que pregunte antes de responder (método socrático), se adapte al nivel del estudiante, funcione en dispositivos móviles de bajos recursos y sin conexión (PWA + Offline First), detecte intentos de trampa alertando al docente y le brinde al profesor un panel analítico en tiempo real del avance del grupo.
 
-### PARA QUIEN
+### PARA QUIÉN
 
-Estudiantes de secundaria y bachillerato, y sus docentes.
+Estudiantes de secundaria y bachillerato de Veracruz, y sus docentes titulares.
 
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+### Frontend (PWA & Offline First)
+- **Vite:** Empaquetador ultrarrápido y liviano con soporte nativo de ES Modules.
+- **React (v19):** Biblioteca declarativa basada en componentes y hooks reutilizables.
+- **Tailwind CSS (v4):** Estilos utilitarios para interfaces mobile-first fluidas y de bajo peso.
+- **Vite PWA (`vite-plugin-pwa` / Workbox):** Service Workers para caché de la aplicación y funcionamiento 100% desconectado.
+- **Dexie.js (IndexedDB):** Base de datos transaccional local reactiva para usuarios, evaluaciones, advertencias y mensajes.
+- **React Router (`react-router-dom` v7):** Navegación fluida del lado del cliente sin recargas de página.
+- **Lucide React:** Iconografía optimizada con tree-shaking mediante imports nombrados.
+
+### Backend e Inteligencia Artificial
+- **Python (v3.11+):** Lenguaje base del servidor y lógica de agentes.
+- **FastAPI:** Framework web asíncrono de alto rendimiento para APIs REST.
+- **Uvicorn:** Servidor ASGI para ejecución en local y producción.
+- **LangChain & LangChain-Groq:** Orquestación de agentes socráticos y cuestionarios adaptativos.
+- **Groq Cloud (`qwen/qwen3.8-27b`):** Inferencia de modelos de lenguaje a ultra baja latencia con salida estructurada en JSON.
+- **Pydantic (v2):** Validación de datos y esquemas tipados.
+
+---
+
+## ⚙️ Instalación y Configuración Local
+
+### Requisitos Previos
+- **Node.js:** v18 o superior.
+- **pnpm:** Gestor de paquetes (`npm install -g pnpm`).
+- **Python:** v3.10 o superior.
+- **Clave de Groq API:** Puedes obtener una gratuita en [console.groq.com/keys](https://console.groq.com/keys).
+
+### 1. Clonar el Repositorio
+```bash
+git clone https://github.com/tu-usuario/hackathon-techweek.git
+cd hackathon-techweek
+```
+
+### 2. Configurar el Backend (Python + FastAPI)
+```bash
+# Crear y activar entorno virtual
+python -m venv .venv
+
+# En Windows:
+.\.venv\Scripts\activate
+# En Linux/Mac:
+# source .venv/bin/activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Configurar variables de entorno
+# Crea un archivo .env en la raíz con tu clave de Groq:
+echo GROQ_API_KEY=tu_clave_de_groq_aqui > .env
+```
+
+### 3. Configurar el Frontend (React + Vite)
+```bash
+# Instalar dependencias con pnpm
+pnpm install
+```
+
+### 4. Ejecución en Desarrollo
+
+Abre dos terminales:
+
+**Terminal 1 - Backend FastAPI:**
+```bash
+# Con el entorno virtual activado (.venv)
+uvicorn server:app --port 8000 --reload
+```
+*API disponible en: `http://localhost:8000` (Swagger UI interactivo en `/docs`)*
+
+**Terminal 2 - Frontend Vite:**
+```bash
+pnpm dev
+```
+*Aplicación web disponible en: `http://localhost:5173`*
+
+---
+
+## 📖 Cómo se Utiliza la Aplicación
+
+### 1. Acceso a la Plataforma (Login)
+- Ingresa a `http://localhost:5173/login`.
+- Puedes alternar entre **Estudiante** y **Docente**.
+- **Credenciales por defecto para evaluación:**
+  - 🎓 **Estudiante:** `maria.rodriguez@jarocha.edu.mx` / `123`
+  - 👨‍🏫 **Docente:** `profesor.javier@jarocha.edu.mx` / `123`
+
+---
+
+### 2. Flujo del Estudiante
+
+1. **Evaluación Diagnóstica Adaptativa (`/evaluacion`):**
+   - Si el alumno ingresa por primera vez, realiza una breve prueba de diagnóstico sobre álgebra y ecuaciones lineales.
+   - Al finalizar, el sistema determina automáticamente su nivel de partida (**Básico**, **Intermedio** o **Avanzado**) guardando los resultados en `IndexedDB`.
+2. **Dashboard del Estudiante (`/dashboard`):**
+   - **Tema Actual (Ecuaciones Lineales):** Resumen pedagógico del módulo en curso.
+   - **Actividades Disponibles:**
+     - 📝 **Test Diagnóstico:** Repaso de 5 minutos sobre ecuaciones lineales.
+     - 🗂️ **Flashcards Interactivas (Estilo NotebookLM):** Tarjetas con repaso activo espaciado que se pueden voltear y deslizar con atajos de teclado.
+     - 🤖 **Ejercicios Guiados con IA:** Generador en vivo de preguntas (Opción múltiple, Verdadero/Falso, Completar) con validación inmediata y botón permanente de pista.
+3. **Chatbot Socrático Jarocha AI:**
+   - Botón flotante siempre visible: ayuda al estudiante sin darle la respuesta directa, guiándolo mediante preguntas, analogías y comprobación de pasos.
+   - **Integridad Académica:** Si el estudiante intenta copiar o pedir respuestas directas, el tutor le advierte amablemente y registra un aviso de integridad en su expediente escolar.
+4. **Modo Sin Conexión (Offline):**
+   - Si se desconecta el internet, la aplicación sigue navegando gracias a la PWA y los datos se guardan en el dispositivo hasta que vuelva la conexión.
+
+---
+
+### 3. Flujo del Docente (`/docente`)
+
+1. **Gestión de Grupos y Alumnos:**
+   - Visualización exclusiva de los alumnos reales registrados y su progreso analítico (promedio, nivel y evaluaciones completadas).
+   - Acciones directas: **Registrar Alumno**, **Editar datos/contraseña** y **Eliminar**.
+2. **Supervisión de Integridad y Alertas de IA:**
+   - **Banner Global:** Informa cuántos intentos indebidos de copia han ocurrido en el grupo.
+   - **Columna Integridad IA:** Identifica rápidamente a los alumnos con alertas (`⚠️ 1 aviso`).
+   - **Expediente de Detalle:** El docente puede ver la fecha, la hora y el mensaje exacto que el alumno le envió al chatbot, con un botón para marcar la advertencia como **"Revisada con el Alumno"**.
+3. **Gestor de Evaluación Diagnóstica:**
+   - Permite al docente personalizar, editar reactivos o crear nuevos exámenes diagnósticos para su clase.
 
 ---
 
@@ -266,7 +387,6 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `agente.py`
   * `README.md`
   * `HISTORIAL.md`
-
 
 ### [Iteración 15] - 12/11/2026
 * **Hecho:**
