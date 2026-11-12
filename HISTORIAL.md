@@ -1,25 +1,44 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
-* **Objetivo actual:** Agente docente único (consola) que genera evaluaciones diagnósticas y actividades con Groq.
-* **Fase:** MVP con memoria y salida JSON — pendiente integración con la web del compañero.
 
 ---
 
 ## 🌳 Estructura Actual del Proyecto
 ```text
-./
+hackathon-techweek/
+├── public/
+├── references/
+│   ├── evaluacion_diagnostica.html
+│   ├── login.html
+│   └── resultado_evaluacion.html
+├── src/
+│   ├── assets/
+│   ├── components/
+│   │   └── ConnectivityBanner.jsx
+│   ├── data/
+│   │   └── diagnosticData.js
+│   ├── db/
+│   │   └── index.js
+│   ├── hooks/
+│   │   └── useOnlineStatus.js
+│   ├── pages/
+│   │   ├── DiagnosticPage.jsx
+│   │   ├── LoginPage.jsx
+│   │   └── ResultPage.jsx
+│   ├── services/
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── .env                     ← NUEVO (no se sube al repo)
+├── agente.js                ← NUEVO (traducción a JavaScript de agente.py)
+├── agente.py
+├── ecuaciones_lineales.pdf
+├── index.html
+├── package.json
+├── pnpm-lock.yaml
+├── vite.config.js
 ├── AGENTS.md
-├── README.md
-├── HISTORIAL.md
-├── .env.example          ← plantilla de credenciales
-├── .env                  ← clave real de Groq (NO se commitea)
-├── .gitignore            ← ignora .env, .venv/, output/, __pycache__/
-├── requirements.txt
-├── agente_profesor.py    ← AGENTE ÚNICO (LangChain + Groq)
-├── output/               ← JSON generados con uso de tokens (NO se commitea)
-└── .venv/                ← entorno virtual (NO se commitea)
-```
 
 ---
 
@@ -32,72 +51,4 @@
 
 ## 📝 Registro de Cambios
 
-### [Iteración 1] - 11/11/2026 — ETAPA 1: Planificación
-* **Hecho:**
-  * Análisis de requerimientos y plan técnico (agente único vs múltiples; workflow vs agente ReAct).
-  * Decisiones: un solo agente con un system prompt, salida estructurada Pydantic, validación en Python, 1 ronda de reparación, ahorro de tokens.
-* **Próximos pasos:** entorno y conexión con Groq.
 
-### [Iteración 2] - 11/11/2026 — ETAPA 2: Entorno
-* **Hecho:**
-  * Entorno virtual `.venv` con Python 3.13 e instalación de `requirements.txt`.
-  * Archivos `.env.example`, `.env` (clave pegada por el usuario), `.gitignore`.
-  * Conexión verificada a Groq; modelo confirmado: `qwen/qwen3.8-27b`.
-* **Archivos creados:** `.env.example`, `.env`, `requirements.txt`, `.gitignore`
-* **Próximos pasos:** escribir el agente.
-
-### [Iteración 3] - 11/11/2026 — ETAPA 3: Agente funcional
-* **Hecho:**
-  * Agente único en `agente_profesor.py`: CLI (`python agente_profesor.py`), system prompt único con reglas para evaluación diagnóstica / actividad / aclaración, salida JSON validada con Pydantic, 1 reparación ante errores, guardado en `output/` con conteo de tokens.
-  * Pruebas reales (3 llamadas a Groq):
-    * Evaluación diagnóstica (ecuaciones lineales, divisiones): OK — 1557 tokens.
-    * Actividad opción múltiple (5 preguntas): OK — 1251 tokens.
-    * Petición sin temas → pide aclaración: OK — 595 tokens.
-* **Archivos modificados/creados:** `agente_profesor.py`
-* **Limitaciones conocidas:**
-  * Cada petición es independiente (sin historial) → "genera además..." no recuerda lo anterior; el tema debe ir en la frase.
-  * El modelo a veces se equivoca en cálculos → el profesor debe revisar antes de usar.
-* **Próximos pasos:** pruebas automatizadas (`pytest` sobre esquemas/validación), proponer commit, y decidir siguiente funcionalidad.
-
-### [Iteración 4] - 11/11/2026 — REESCRITURA SIMPLE: agente de consola en un solo archivo
-* **Hecho:**
-  * `agente_profesor.py` reescrito desde cero (versión mínima solicitada por el usuario, sin Pydantic ni guardado JSON con tokens):
-    * Paso 1: conexión con Groq (`qwen/qwen3.8-27b`, temperatura 0.4).
-    * Paso 2: `INSTRUCCIONES` (system prompt con reglas actividad/evaluación/aclaración) + función `generar_respuesta()`.
-    * Paso 3: bucle de consola (`Profesor >` / `salir`).
-    * Fix `max_tokens=1000` (error 429 OTPM del plan on_demand) + sección de ejecución en `README.md`.
-  * Guardado en `output/` implementado y luego eliminado a petición del usuario (por ahora solo imprime en pantalla).
-  * Pruebas reales OK: actividad de opción múltiple (3 preguntas) y evaluación diagnóstica de 3 niveles.
-* **Commits:** `feat: configurar modelo de Groq`, `feat: crear agente educativo`, `test: probar generación de actividades`, `feat: guardar respuestas en output/`, `docs: agregar instrucciones de ejecución`, `refactor: quitar guardado de respuestas`
-* **Limitaciones conocidas:**
-  * Límite Groq on_demand: 1000 tokens de salida por minuto → evaluaciones muy largas (15 preguntas) pueden quedar truncadas.
-  * Sin historial de conversación (cada petición es independiente).
-* **Próximos pasos:** commitear este HISTORIAL + `.env.example`, `.gitignore`, `requirements.txt`; decidir siguiente funcionalidad con el usuario.
-
-### [Iteración 5] - 11/11/2026 — MEMORIA con checkpointer
-* **Hecho:**
-  * Nombre corregido a **Aprender a la Jarocha** (antes decía AULA+).
-  * Agente con memoria de conversación usando `create_agent` + `InMemorySaver` (checkpointer en RAM, un solo `thread_id` "profesor").
-  * `generar_respuesta()` ahora invoca al agente con `config=CONFIG`; se eliminó el manejo manual de `SystemMessage`/`HumanMessage`.
-  * Prueba OK: "2 preguntas más sobre el mismo tema" continuó numeración y formato anteriores.
-* **Archivos modificados:** `agente_profesor.py`, `README.md`
-* **Commits:** `docs: renombrar app a Aprender a la Jarocha`, `feat: agregar memoria al agente con checkpointer`
-* **Limitaciones conocidas:**
-  * La memoria vive en RAM: se pierde al cerrar la consola.
-  * El historial crece en cada turno (más tokens de entrada con el tiempo).
-* **Próximos pasos:** decidir siguiente funcionalidad con el usuario.
-
-### [Iteración 6] - 11/11/2026 — SALIDA JSON para la web
-* **Hecho:**
-  * Modelos Pydantic `Pregunta` y `ContenidoEducativo` + `response_format` en `create_agent` → el agente devuelve un JSON validado.
-  * `mostrar_en_pantalla()` imprime el contenido legible para el profesor (como antes).
-  * `guardar_json()` escribe `output/contenido_N.json` numerado sin sobreescribir (cada petición = un JSON nuevo para "subir" a la plataforma).
-  * La web podrá mostrar el ejercicio al alumno (modo Kahoot con `opciones[]`) y calificar con `respuesta_correcta`; la calificación NO es tarea del agente.
-  * `INSTRUCCIONES`: si faltan datos → `estado="necesita_aclaracion"` (no guarda JSON); explicaciones máximo 2 oraciones (límite 1000 tokens de Groq).
-  * Pruebas OK: 2 actividades → `contenido_1.json` y `contenido_2.json`; petición sin datos → pidió aclaración sin guardar.
-* **Archivos modificados:** `agente_profesor.py`
-* **Commits:** `feat: agregar salida JSON con Pydantic`
-* **Limitaciones conocidas:**
-  * Aviso cosmético de langgraph ("unregistered type __main__.ContenidoEducativo") en la 2ª petición; funciona bien, no se bloquea aún.
-  * 1000 tokens de salida por minuto → evaluaciones muy largas pueden truncarse.
-* **Próximos pasos:** integración con la web del compañero (el JSON de `output/` es el contrato).
