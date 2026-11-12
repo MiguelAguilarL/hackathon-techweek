@@ -81,4 +81,3 @@ hackathon-techweek/
   * `src/pages/TeacherDashboard.jsx`
   * `src/pages/LoginPage.jsx`
   * `HISTORIAL.md`
-
