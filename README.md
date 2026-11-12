@@ -164,3 +164,17 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `src/components/InteractiveFlashcardsModal.jsx`
   * `src/pages/StudentDashboard.jsx`
   * `HISTORIAL.md`
+
+### [Iteración 8] - 12/11/2026
+* **Hecho:**
+  * Se adaptó [agente_profesor.py](agente_profesor.py) para que genere cuestionarios dirigidos al **estudiante**: recibe solo el tipo elegido y produce **exactamente 5 preguntas** sobre **ecuaciones de primer grado** (único tema permitido).
+  * Tipos: `opcion_multiple` (4 opciones / 1 correcta), `verdadero_falso` ("Verdadero" / "Falso") y `completar_respuesta` (espacio en blanco + 4 opciones).
+  * Se conservó la estructura JSON existente del proyecto y la respuesta regresa como **dict nativo de Python** (`json.loads`).
+  * Se eliminó la memoria (checkpointer) y se quitó `response_format`, que fallaba con `tool_use_failed` en `qwen/qwen3.8-27b`.
+  * Verificación: 8/8 corridas válidas con 5 preguntas y el tema correcto.
+* **Archivos modificados/creados:**
+  * `agente_profesor.py`
+  * `HISTORIAL.md`
+  * `README.md`
+* **Próximos pasos sugeridos:**
+  * Exponer el agente en `server.py` y consumirlo desde el frontend para abrir el cuestionario desde el dashboard del estudiante.
