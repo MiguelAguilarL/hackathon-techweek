@@ -1,7 +1,7 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
-* **Objetivo actual:** Integración completa del chatbot pedagógico (`agente.py`) con la UI de React mediante un servidor FastAPI en entorno virtual Python 3.14.
+* **Objetivo actual:** Creación y modificación de la Evaluación Diagnóstica por el docente desde su Dashboard (preguntas de opción múltiple con 4 incisos) y sincronización con el estudiante.
 * **Fase:** Prototipado / Desarrollo UI e Integración con IA (Mobile-First & PWA).
 
 ---
@@ -21,6 +21,7 @@ hackathon-techweek/
 │   ├── assets/
 │   ├── components/
 │   │   ├── ConnectivityBanner.jsx
+│   │   ├── DiagnosticEditorModal.jsx
 │   │   └── SocraticChatModal.jsx
 │   ├── data/
 │   │   └── diagnosticData.js
@@ -35,7 +36,8 @@ hackathon-techweek/
 │   │   ├── StudentDashboard.jsx
 │   │   └── TeacherDashboard.jsx
 │   ├── services/
-│   │   └── chatService.js
+│   │   ├── chatService.js
+│   │   └── diagnosticService.js
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
@@ -55,22 +57,20 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-### [Iteración 5] - 11/11/2026
+### [Iteración 6] - 11/11/2026
 * **Hecho:** 
-  * Se creó [requirements.txt](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/requirements.txt) con las dependencias necesarias del backend (`fastapi`, `uvicorn`, `langchain`, `langchain-groq`, `pypdf`, `python-dotenv`, etc.).
-  * Se inicializó el entorno virtual `.venv` con **Python 3.14** y se instalaron todas las dependencias.
-  * Se creó el servidor [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) con FastAPI que expone `/api/chat` e importa `agente` y `Contexto` de [agente.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/agente.py) sin modificar este último.
-  * Se creó el servicio [chatService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/chatService.js) para gestionar la comunicación cliente-servidor.
-  * Se implementó el componente [SocraticChatModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/SocraticChatModal.jsx) con estilo mobile-first, burbujas accesibles, quick replies, loader animado y persistencia en Dexie.js con soporte offline.
-  * Se integró el modal en [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) y en [DiagnosticPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/DiagnosticPage.jsx).
-  * Se compiló el frontend con `pnpm build` de manera satisfactoria.
+  * Se implementó el servicio [diagnosticService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/diagnosticService.js) y se actualizó el esquema en [db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js) (tabla `activeDiagnostics`) con persistencia dual en `Dexie.js` y `localStorage`.
+  * Se creó el componente [DiagnosticEditorModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/DiagnosticEditorModal.jsx) para editar o crear exámenes con preguntas de **opción múltiple de 4 incisos** (`a`, `b`, `c`, `d`), asignación de respuesta correcta y validaciones.
+  * Se actualizó [TeacherDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/TeacherDashboard.jsx) para que al pulsar **"Evaluación Diagnóstica"** en el sidebar se despliegue la vista de gestión con:
+    * Vista previa completa de los reactivos vigentes con incisos y respuesta correcta destacada en verde.
+    * Botón **"Modificar Evaluación"** para editar los reactivos existentes.
+    * Botón **"Crear Nueva Evaluación"** para redactar un examen nuevo y reemplazar el que está en curso.
+  * Se actualizó [DiagnosticPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/DiagnosticPage.jsx) para cargar reactivamente la evaluación activa configurada por el docente, recalculando dinámicamente aciertos y progreso.
+  * Se verificó la compilación de producción con `pnpm build` de manera exitosa.
 * **Archivos modificados/creados:**
-  * `requirements.txt`
-  * `server.py`
-  * `src/services/chatService.js`
-  * `src/components/SocraticChatModal.jsx`
-  * `src/pages/StudentDashboard.jsx`
+  * `src/db/index.js`
+  * `src/services/diagnosticService.js`
+  * `src/components/DiagnosticEditorModal.jsx`
+  * `src/pages/TeacherDashboard.jsx`
   * `src/pages/DiagnosticPage.jsx`
   * `HISTORIAL.md`
-* **Próximos pasos sugeridos:**
-  * Probar conversaciones guiadas de ejercicios matemáticos con el modelo Groq activo.

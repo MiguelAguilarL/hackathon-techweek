@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { MessageSquare, ArrowRight, Sparkles, X, CheckCircle2 } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
 import SocraticChatModal from '../components/SocraticChatModal';
-import { DIAGNOSTIC_QUESTIONS, MOCK_USER } from '../data/diagnosticData';
+import { MOCK_USER } from '../data/diagnosticData';
+import { getActiveDiagnostic } from '../services/diagnosticService';
 import { db } from '../db';
 
 export default function DiagnosticPage() {
@@ -13,6 +14,7 @@ export default function DiagnosticPage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeExam, setActiveExam] = useState(null);
 
   useEffect(() => {
     const raw = localStorage.getItem('currentUser');
@@ -29,11 +31,13 @@ export default function DiagnosticPage() {
     } else {
       setShowWelcomeModal(true);
     }
+
+    // Cargar la evaluación diagnóstica activa (configurada por el docente)
+    getActiveDiagnostic().then((exam) => setActiveExam(exam));
   }, []);
 
   const handleDismissWelcome = () => {
     setShowWelcomeModal(false);
-    // Marcamos que ya vio la bienvenida
     const updated = { ...currentUser, firstTime: false };
     setCurrentUser(updated);
     localStorage.setItem('currentUser', JSON.stringify(updated));
@@ -46,15 +50,11 @@ export default function DiagnosticPage() {
     }));
   };
 
-  const handleTextChange = (qId, text) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [qId]: text
-    }));
-  };
+  const questionsList = activeExam?.questions || [];
+  const totalQuestions = questionsList.length;
 
   // Cálculo de progreso
-  const answeredCount = DIAGNOSTIC_QUESTIONS.reduce((count, q) => {
+  const answeredCount = questionsList.reduce((count, q) => {
     const ans = answers[q.id];
     if (ans && typeof ans === 'string' && ans.trim().length > 0) {
       return count + 1;
@@ -62,25 +62,19 @@ export default function DiagnosticPage() {
     return count;
   }, 0);
 
-  const totalQuestions = DIAGNOSTIC_QUESTIONS.length;
-  const progressPercentage = Math.round((answeredCount / totalQuestions) * 100);
+  const progressPercentage = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Calcular aciertos en preguntas de opción múltiple
+    // Calcular aciertos en preguntas de opción múltiple con 4 incisos
     let score = 0;
-    DIAGNOSTIC_QUESTIONS.forEach((q) => {
-      if (q.type === 'choice' && answers[q.id] === q.correctAnswer) {
+    questionsList.forEach((q) => {
+      if (answers[q.id] === q.correctAnswer) {
         score += 1;
       }
     });
-
-    // Para la pregunta abierta, si respondió algo sustancial, otorgamos el punto del diagnóstico
-    if (answers[6] && answers[6].trim().length >= 5) {
-      score += 1;
-    }
 
     const evaluationResult = {
       score,
@@ -90,7 +84,8 @@ export default function DiagnosticPage() {
       studentName: currentUser.name,
       studentInitials: currentUser.initials,
       grade: currentUser.grade,
-      subject: currentUser.subject
+      subject: activeExam?.subject || currentUser.subject,
+      examTitle: activeExam?.title || 'Evaluación Diagnóstica'
     };
 
     try {
@@ -164,13 +159,17 @@ export default function DiagnosticPage() {
                 <span className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">
                   Materia
                 </span>
-                <p className="font-semibold text-slate-700 mt-0.5">{currentUser.subject || 'Matemáticas Aplicadas'}</p>
+                <p className="font-semibold text-slate-700 mt-0.5">
+                  {activeExam?.subject || currentUser.subject || 'Matemáticas Aplicadas'}
+                </p>
               </div>
               <div>
                 <span className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">
                   Grado y grupo
                 </span>
-                <p className="font-semibold text-slate-700 mt-0.5">{currentUser.grade || '3° "B" Secundaria'}</p>
+                <p className="font-semibold text-slate-700 mt-0.5">
+                  {activeExam?.grade || currentUser.grade || '3° "B" Secundaria'}
+                </p>
               </div>
               <div>
                 <span className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">
@@ -189,9 +188,14 @@ export default function DiagnosticPage() {
             {/* Header del Panel y Barra de Progreso */}
             <div className="mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-slate-100">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 uppercase">
-                  Evaluación Diagnóstica
-                </h2>
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 uppercase">
+                    {activeExam?.title || 'Evaluación Diagnóstica'}
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Reactivos de opción múltiple (4 incisos)
+                  </p>
+                </div>
                 <span className="text-sm font-bold text-emerald-600">
                   {progressPercentage}% ({answeredCount}/{totalQuestions})
                 </span>
@@ -208,58 +212,44 @@ export default function DiagnosticPage() {
 
             {/* Formulario con Preguntas */}
             <form className="space-y-8" onSubmit={handleSubmit}>
-              {DIAGNOSTIC_QUESTIONS.map((q, index) => (
+              {questionsList.map((q, index) => (
                 <div
-                  key={q.id}
+                  key={q.id || index}
                   className={`space-y-4 ${index > 0 ? 'pt-6 border-t border-slate-100' : ''}`}
                 >
                   <h3 className="text-base font-semibold text-slate-800 leading-snug">
-                    <span className="text-emerald-600 font-bold mr-2">{q.id}.</span>
+                    <span className="text-emerald-600 font-bold mr-2">{index + 1}.</span>
                     {q.prompt}
                   </h3>
 
-                  {q.type === 'choice' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-1 sm:pl-6">
-                      {q.options.map((opt) => {
-                        const isSelected = answers[q.id] === opt.key;
-                        return (
-                          <label
-                            key={opt.key}
-                            className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all min-h-[44px] ${
-                              isSelected
-                                ? 'border-emerald-600 bg-emerald-50/70 shadow-xs'
-                                : 'border-slate-200 hover:border-emerald-400 hover:bg-slate-50'
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name={`q${q.id}`}
-                              value={opt.key}
-                              checked={isSelected}
-                              onChange={() => handleChoiceChange(q.id, opt.key)}
-                              className="text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-slate-300 cursor-pointer"
-                            />
-                            <span className="ml-3 text-sm font-medium text-slate-700">
-                              <span className="font-bold text-slate-400 mr-1.5">{opt.key})</span>
-                              {opt.text}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {q.type === 'open' && (
-                    <div className="pl-1 sm:pl-6">
-                      <textarea
-                        rows={3}
-                        value={answers[q.id] || ''}
-                        onChange={(e) => handleTextChange(q.id, e.target.value)}
-                        placeholder={q.placeholder}
-                        className="w-full sm:max-w-xl px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm placeholder:text-slate-400 outline-hidden transition-all bg-slate-50 focus:bg-white"
-                      />
-                    </div>
-                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-1 sm:pl-6">
+                    {q.options?.map((opt) => {
+                      const isSelected = answers[q.id] === opt.key;
+                      return (
+                        <label
+                          key={opt.key}
+                          className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all min-h-[44px] ${
+                            isSelected
+                              ? 'border-emerald-600 bg-emerald-50/70 shadow-xs'
+                              : 'border-slate-200 hover:border-emerald-400 hover:bg-slate-50'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={`q${q.id}`}
+                            value={opt.key}
+                            checked={isSelected}
+                            onChange={() => handleChoiceChange(q.id, opt.key)}
+                            className="text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-slate-300 cursor-pointer"
+                          />
+                          <span className="ml-3 text-sm font-medium text-slate-700">
+                            <span className="font-bold text-slate-400 mr-1.5">{opt.key})</span>
+                            {opt.text}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               ))}
 
@@ -267,7 +257,7 @@ export default function DiagnosticPage() {
               <div className="pt-6 border-t border-slate-100 flex items-center justify-end">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || totalQuestions === 0}
                   className="w-full sm:w-auto min-h-[44px] px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
                 >
                   <span>{isSubmitting ? 'Guardando...' : 'Finalizar y ver resultado'}</span>
@@ -305,7 +295,7 @@ export default function DiagnosticPage() {
               </h2>
 
               <p className="text-sm text-slate-600 leading-relaxed text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
-                Esta es tu primera vez en <strong>Aprender a la jarocha</strong>. Para que tu tutor personalizado se adapte a tu ritmo y estilo de aprendizaje, realizaremos una breve <strong>evaluación diagnóstica</strong> de matemáticas básicas (6 preguntas).
+                Esta es tu primera vez en <strong>Aprender a la jarocha</strong>. Para que tu tutor personalizado se adapte a tu ritmo y estilo de aprendizaje, realizaremos tu <strong>evaluación diagnóstica</strong> con reactivos de opción múltiple.
               </p>
 
               <div className="space-y-2 text-xs text-slate-500 text-left pt-1">
@@ -315,7 +305,7 @@ export default function DiagnosticPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Funciona incluso con conexión lenta o intermitente.</span>
+                  <span>Preguntas directas de opción múltiple (4 incisos).</span>
                 </div>
               </div>
 
