@@ -163,16 +163,7 @@ export default function StudentDashboard() {
           </nav>
 
           <div className="space-y-3">
-            <div className="p-3.5 bg-[#e9efe9] rounded-2xl border border-[#bccac0]/30">
-              <p className="text-xs text-[#3d4a42] font-medium">¿Necesitas ayuda?</p>
-              <button
-                type="button"
-                onClick={() => alert('El Tutor IA socrático responderá tus preguntas paso a paso.')}
-                className="text-xs font-bold text-[#006948] hover:underline mt-1 block text-left cursor-pointer"
-              >
-                Contactar soporte IA
-              </button>
-            </div>
+            
 
             <button
               type="button"
@@ -226,25 +217,13 @@ export default function StudentDashboard() {
                       ¡Qué tal, {currentUser.name.split(' ')[0]}! 👋
                     </h2>
                     <p className="text-sm text-[#3d4a42]">
-                      Materia actual: <span className="font-bold text-[#171d19]">{currentUser.subject || 'Matemáticas Aplicadas'}</span> — Estás a solo 3 actividades de completar esta unidad.
+                      Materia actual: <span className="font-bold text-[#171d19]">{currentUser.subject || 'Matemáticas Aplicadas'}</span> 
                     </p>
                   </div>
                 </div>
 
                 {/* Gauge de Progreso General */}
-                <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-100 lg:w-80 flex flex-col justify-center">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-xs font-semibold text-[#3d4a42]">Progreso General del Curso</span>
-                    <span className="text-lg font-extrabold text-[#006948]">68%</span>
-                  </div>
-                  <div className="w-full h-3 bg-[#e9efe9] rounded-full overflow-hidden mb-2">
-                    <div className="h-full bg-[#006948] rounded-full transition-all duration-1000" style={{ width: '68%' }} />
-                  </div>
-                  <div className="flex justify-between text-[11px] text-[#3d4a42] font-medium">
-                    <span>Unidad 3 de 4</span>
-                    <span>12/18 Módulos</span>
-                  </div>
-                </div>
+                
               </div>
             </section>
 
@@ -289,55 +268,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Estadísticas de Racha */}
-              <div className="rounded-3xl bg-white p-6 shadow-xs border border-slate-100 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-base font-bold text-[#171d19] mb-4 flex items-center">
-                    <TrendingUp className="w-5 h-5 text-[#006948] mr-2" />
-                    Estadísticas de Racha
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3.5 bg-[#eff5ef] rounded-2xl">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
-                          <Flame className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <span className="block text-xs font-bold text-[#171d19]">Racha Actual</span>
-                          <span className="text-[11px] text-[#3d4a42]">5 días consecutivos</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-extrabold text-[#9b3e3b] bg-red-50 px-2 py-1 rounded-lg">
-                        Top 10%
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3.5 bg-[#eff5ef] rounded-2xl">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
-                          <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
-                        </div>
-                        <div>
-                          <span className="block text-xs font-bold text-[#171d19]">Puntos Jarocha</span>
-                          <span className="text-[11px] text-[#3d4a42]">1,450 XP ganados</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-extrabold text-[#006948] bg-emerald-50 px-2 py-1 rounded-lg">
-                        +120
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 text-right">
-                  <Link
-                    to="/resultado"
-                    className="text-xs font-bold text-[#006948] hover:underline inline-flex items-center"
-                  >
-                    <span>Ver reporte de diagnóstico</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </Link>
-                </div>
-              </div>
+              
             </section>
 
             {/* Sección de Actividades Disponibles */}
@@ -462,127 +393,8 @@ export default function StudentDashboard() {
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
               {/* Lista de Historial */}
-              <div className="lg:col-span-2 rounded-3xl bg-white p-6 sm:p-8 shadow-xs border border-slate-100">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-base font-bold text-[#171d19] flex items-center">
-                    <Clock className="w-5 h-5 text-[#006948] mr-2" />
-                    Historial de Actividades Recientes
-                  </h4>
-                  <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-bold text-[#006948] hover:underline">
-                    Ver todo
-                  </a>
-                </div>
-
-                <div className="space-y-3">
-                  {/* Item 1 */}
-                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#e9efe9] transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#006948] text-white flex items-center justify-center shrink-0">
-                        <Check className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-bold text-[#171d19]">
-                          Cuestionario: Ley de Senos y Cosenos
-                        </h5>
-                        <p className="text-[11px] text-[#3d4a42]">Completado ayer • 10/10 aciertos</p>
-                      </div>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#006948] text-xs font-bold">
-                      100 Pts
-                    </span>
-                  </div>
-
-                  {/* Item 2 */}
-                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#e9efe9] transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#006948] text-white flex items-center justify-center shrink-0">
-                        <Check className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-bold text-[#171d19]">
-                          Simulador Gráfico: Vectores en el Plano
-                        </h5>
-                        <p className="text-[11px] text-[#3d4a42]">Completado hace 3 días • Práctica libre</p>
-                      </div>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#006948] text-xs font-bold">
-                      85 Pts
-                    </span>
-                  </div>
-
-                  {/* Item 3 */}
-                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#e9efe9] transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#006948] text-white flex items-center justify-center shrink-0">
-                        <Check className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-bold text-[#171d19]">
-                          Lectura Teórica: Razones Trigonométricas
-                        </h5>
-                        <p className="text-[11px] text-[#3d4a42]">Completado hace 4 días • 100% leído</p>
-                      </div>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#006948] text-xs font-bold">
-                      50 Pts
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Accesos Rápidos */}
-              <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-xs border border-slate-100 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-base font-bold text-[#171d19] mb-4 flex items-center">
-                    <Sparkles className="w-5 h-5 text-[#006948] mr-2" />
-                    Accesos Rápidos
-                  </h4>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => alert('Abriendo formulario de matemáticas descargable')}
-                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
-                    >
-                      <BookOpen className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
-                      <span className="text-xs font-semibold">Formulario</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => alert('Abriendo calculadora científica integrada')}
-                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
-                    >
-                      <Calculator className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
-                      <span className="text-xs font-semibold">Calculadora</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => alert('Foro comunitario de dudas entre alumnos de Veracruz')}
-                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
-                    >
-                      <MessageSquare className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
-                      <span className="text-xs font-semibold">Foro de Dudas</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => alert('Descargando guías y recursos en PDF para consultar sin conexión')}
-                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
-                    >
-                      <Download className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
-                      <span className="text-xs font-semibold">Recursos PDF</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-6 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
-                  <p className="text-xs text-[#3d4a42] mb-1 font-medium">Próxima sesión con docente</p>
-                  <p className="text-sm font-bold text-[#006948]">Mañana, 10:00 AM</p>
-                </div>
-              </div>
-
+              
+              
             </section>
           </div>
         </main>
