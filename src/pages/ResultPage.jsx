@@ -211,10 +211,10 @@ export default function ResultPage() {
 
                 <button
                   type="button"
-                  onClick={() => alert('¡Diagnóstico completado! El siguiente paso será interactuar con el Tutor Socrático Jarocho.')}
+                  onClick={() => navigate('/dashboard')}
                   className="w-full sm:w-auto min-h-[48px] px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-emerald-700/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                 >
-                  <span>Continuar al Dashboard / Tutor</span>
+                  <span>Continuar al Dashboard</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

@@ -1,7 +1,7 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
-* **Objetivo actual:** Flujo completo de Autenticación, Bienvenida, Evaluación Diagnóstica (6 preguntas de matemáticas) y Resultados.
+* **Objetivo actual:** Implementación del Dashboard del Estudiante en base a `references/dashboard_estudiante.html`, conectando el flujo de resultados con el dashboard con datos reales del usuario y nivel obtenido.
 * **Fase:** Prototipado / Desarrollo UI (Mobile-First & PWA).
 
 ---
@@ -11,6 +11,7 @@
 hackathon-techweek/
 ├── public/
 ├── references/
+│   ├── dashboard_estudiante.html
 │   ├── evaluacion_diagnostica.html
 │   ├── login.html
 │   └── resultado_evaluacion.html
@@ -27,7 +28,8 @@ hackathon-techweek/
 │   ├── pages/
 │   │   ├── DiagnosticPage.jsx
 │   │   ├── LoginPage.jsx
-│   │   └── ResultPage.jsx
+│   │   ├── ResultPage.jsx
+│   │   └── StudentDashboard.jsx
 │   ├── services/
 │   ├── App.jsx
 │   ├── index.css
@@ -45,28 +47,26 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-### [Iteración 2] - 11/11/2026
+### [Iteración 3] - 11/11/2026
 * **Hecho:** 
-  * Se configuraron credenciales y datos del usuario de prueba (`maria.rodriguez@jarocha.edu.mx` / `123`) con botón de autocompletado en el login.
-  * Se diseñó el modal de bienvenida amigable para cuando el estudiante ingresa por primera vez.
-  * Se creó [DiagnosticPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/DiagnosticPage.jsx) basándose en `references/evaluacion_diagnostica.html`:
-    * 6 preguntas sobre matemáticas básicas (ecuaciones lineales y despejes: 5 de opción múltiple y 1 pregunta explicativa abierta).
-    * Barra de progreso interactiva reactiva en tiempo real.
-    * Persistencia de los resultados tanto en `localStorage` como en `Dexie.js` (IndexedDB) para funcionamiento offline.
-  * Se creó [ResultPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/ResultPage.jsx) basándose en `references/resultado_evaluacion.html`:
-    * Cálculo dinámico de aciertos y nivel de partida (Básico, Intermedio, Avanzado).
-    * Retroalimentación y aspectos a mejorar estructurados.
-    * Opciones para repetir la evaluación o continuar.
-  * Se actualizaron las rutas en [App.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/App.jsx) (`/login`, `/evaluacion`, `/resultado`).
-  * Se comprobó la compilación exitosa con `pnpm build`.
+  * Se implementó [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) reproduciendo la estructura visual, jerarquía y componentes de `references/dashboard_estudiante.html`:
+    * Encabezado superior con estado online y nombre del estudiante logueado.
+    * Menú lateral de navegación responsivo (con drawer para pantallas móviles y targets táctiles de mínimo 44px).
+    * Banner de bienvenida personalizado con avatar, grado/grupo, materia actual y nivel de aprendizaje adaptado al resultado del diagnóstico.
+    * Medidor de progreso general del curso (68%, Unidad 3 de 4, 12/18 módulos).
+    * Módulo activo con botón "Continuar Módulo" y tiempo estimado.
+    * Tarjeta de estadísticas de racha (5 días consecutivos, puntos jarocha ganados).
+    * Parrilla de actividades disponibles (Test diagnóstico, flashcards interactivas, práctica guiada con IA y reto semanal).
+    * Historial reciente de actividades y panel de accesos rápidos (formulario, calculadora, foro, recursos PDF descargables para offline).
+    * Botón flotante para asistencia del tutor socrático.
+  * Se conectó el botón **"Continuar al Dashboard"** de [ResultPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/ResultPage.jsx) para redirigir a `/dashboard`.
+  * Se registró la ruta `/dashboard` en [App.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/App.jsx).
+  * Se verificó la compilación de producción con `pnpm build` sin ningún error.
 * **Archivos modificados/creados:**
-  * `src/data/diagnosticData.js`
-  * `src/db/index.js`
-  * `src/pages/LoginPage.jsx`
-  * `src/pages/DiagnosticPage.jsx`
+  * `src/pages/StudentDashboard.jsx`
   * `src/pages/ResultPage.jsx`
   * `src/App.jsx`
   * `HISTORIAL.md`
 * **Próximos pasos sugeridos:**
-  * Desarrollar el tutor socrático (chat guiado) que tome como base el diagnóstico obtenido.
-  * Implementar el panel o vista docente para consultar el avance del grupo.
+  * Implementar el chat socrático interactivo que guíe al estudiante paso a paso según el nivel detectado en la evaluación diagnóstica.
+  * Implementar la vista del docente para monitorear el progreso del grupo de alumnos.

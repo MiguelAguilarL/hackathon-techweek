@@ -1,0 +1,604 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  GraduationCap,
+  HelpCircle,
+  TrendingUp,
+  Play,
+  Clock,
+  Flame,
+  Star,
+  ArrowRight,
+  Check,
+  BookOpen,
+  Calculator,
+  MessageSquare,
+  Download,
+  Bot,
+  Menu,
+  X,
+  LogOut,
+  Sparkles,
+  Award
+} from 'lucide-react';
+import ConnectivityBanner from '../components/ConnectivityBanner';
+import { MOCK_USER } from '../data/diagnosticData';
+
+export default function StudentDashboard() {
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(MOCK_USER);
+  const [evaluationResult, setEvaluationResult] = useState(null);
+
+  useEffect(() => {
+    const rawUser = localStorage.getItem('currentUser');
+    if (rawUser) {
+      try {
+        setCurrentUser(JSON.parse(rawUser));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    const rawEval = localStorage.getItem('lastEvaluationResult');
+    if (rawEval) {
+      try {
+        setEvaluationResult(JSON.parse(rawEval));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
+
+  // Determinar nivel detectado en la evaluación
+  const score = evaluationResult ? evaluationResult.score : 5;
+  const total = evaluationResult ? evaluationResult.total : 6;
+  const scorePercentage = Math.round((score / total) * 100);
+
+  let levelText = 'Nivel Intermedio';
+  if (scorePercentage < 50) {
+    levelText = 'Nivel Básico';
+  } else if (scorePercentage >= 80) {
+    levelText = 'Nivel Avanzado';
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    navigate('/login');
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col justify-between bg-[#f5fbf5] text-[#171d19] antialiased selection:bg-emerald-500 selection:text-white">
+      {/* Banner de Conectividad */}
+      <ConnectivityBanner />
+
+      {/* Header Superior */}
+      <header className="bg-white border-b border-[#bccac0]/30 shadow-xs sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            {/* Botón hamburguesa móvil */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label="Abrir menú"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+
+            <div className="w-10 h-10 rounded-xl bg-[#006948] flex items-center justify-center text-white font-bold text-xl shadow-md">
+              AJ
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-[#006948] to-[#00855d] bg-clip-text text-transparent">
+              Aprender a la jarocha
+            </h1>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <div className="hidden sm:flex items-center space-x-1.5 text-sm font-medium text-[#3d4a42]">
+              <span>Estudiante:</span>
+              <span className="font-bold text-[#171d19]">{currentUser.name}</span>
+            </div>
+
+            <div className="flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span className="text-[11px] font-semibold tracking-wider text-emerald-800 uppercase">
+                ONLINE
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Menú lateral izquierdo (Desktop & Mobile Drawer) */}
+      <div className="flex-grow flex relative">
+        <aside
+          className={`fixed lg:sticky top-16 bottom-0 left-0 w-64 bg-[#eff5ef] border-r border-[#bccac0]/30 z-20 flex flex-col justify-between p-4 transition-transform duration-200 ease-in-out ${
+            mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
+          style={{ height: 'calc(100vh - 4rem)' }}
+        >
+          <nav className="space-y-1">
+            <Link
+              to="/dashboard"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center px-4 py-2.5 rounded-xl transition-colors bg-[#006948] text-white font-semibold text-sm shadow-xs"
+            >
+              <LayoutDashboard className="w-4 h-4 mr-3" />
+              <span>Dashboard</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => alert('Módulo de Cursos disponible próximamente.')}
+              className="w-full flex items-center px-4 py-2.5 rounded-xl text-[#171d19] hover:bg-[#dee4de] transition-colors text-sm font-medium text-left cursor-pointer min-h-[44px]"
+            >
+              <GraduationCap className="w-4 h-4 mr-3 text-slate-500" />
+              <span>Mis Cursos</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => alert('Módulo de Actividades disponible próximamente.')}
+              className="w-full flex items-center px-4 py-2.5 rounded-xl text-[#171d19] hover:bg-[#dee4de] transition-colors text-sm font-medium text-left cursor-pointer min-h-[44px]"
+            >
+              <HelpCircle className="w-4 h-4 mr-3 text-slate-500" />
+              <span>Actividades</span>
+            </button>
+            <Link
+              to="/resultado"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center px-4 py-2.5 rounded-xl text-[#171d19] hover:bg-[#dee4de] transition-colors text-sm font-medium min-h-[44px]"
+            >
+              <TrendingUp className="w-4 h-4 mr-3 text-slate-500" />
+              <span>Progreso Diagnóstico</span>
+            </Link>
+          </nav>
+
+          <div className="space-y-3">
+            <div className="p-3.5 bg-[#e9efe9] rounded-2xl border border-[#bccac0]/30">
+              <p className="text-xs text-[#3d4a42] font-medium">¿Necesitas ayuda?</p>
+              <button
+                type="button"
+                onClick={() => alert('El Tutor IA socrático responderá tus preguntas paso a paso.')}
+                className="text-xs font-bold text-[#006948] hover:underline mt-1 block text-left cursor-pointer"
+              >
+                Contactar soporte IA
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full flex items-center px-4 py-2.5 rounded-xl text-red-700 hover:bg-red-50 transition-colors text-xs font-semibold cursor-pointer min-h-[44px]"
+            >
+              <LogOut className="w-4 h-4 mr-3 text-red-600" />
+              <span>Cerrar sesión</span>
+            </button>
+          </div>
+        </aside>
+
+        {/* Backdrop móvil */}
+        {mobileMenuOpen && (
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 bg-slate-900/40 z-10 lg:hidden"
+          />
+        )}
+
+        {/* Contenido Principal */}
+        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-grow">
+          <div className="flex flex-col w-full space-y-6 pb-12">
+            
+            {/* Banner de Bienvenida y Resumen de Perfil */}
+            <section className="relative overflow-hidden rounded-3xl bg-[#eff5ef] p-6 sm:p-8 shadow-xs border border-slate-100">
+              <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[#006948]/10 blur-3xl pointer-events-none" />
+              <div className="absolute right-1/3 -bottom-20 w-48 h-48 rounded-full bg-[#6cf8bb]/20 blur-2xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex items-start space-x-4">
+                  <div className="relative shrink-0">
+                    <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-md bg-emerald-700 text-white flex items-center justify-center font-bold text-2xl">
+                      {currentUser.initials || 'MR'}
+                    </div>
+                    <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#006948] border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">
+                      ✓
+                    </span>
+                  </div>
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-[#006948] text-xs font-bold uppercase tracking-wider">
+                        {levelText}
+                      </span>
+                      <span className="text-[#3d4a42] text-xs font-medium">
+                        {currentUser.grade || '3° "B" Secundaria'}
+                      </span>
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[#171d19] mb-1">
+                      ¡Qué tal, {currentUser.name.split(' ')[0]}! 👋
+                    </h2>
+                    <p className="text-sm text-[#3d4a42]">
+                      Materia actual: <span className="font-bold text-[#171d19]">{currentUser.subject || 'Matemáticas Aplicadas'}</span> — Estás a solo 3 actividades de completar esta unidad.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Gauge de Progreso General */}
+                <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-100 lg:w-80 flex flex-col justify-center">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-xs font-semibold text-[#3d4a42]">Progreso General del Curso</span>
+                    <span className="text-lg font-extrabold text-[#006948]">68%</span>
+                  </div>
+                  <div className="w-full h-3 bg-[#e9efe9] rounded-full overflow-hidden mb-2">
+                    <div className="h-full bg-[#006948] rounded-full transition-all duration-1000" style={{ width: '68%' }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-[#3d4a42] font-medium">
+                    <span>Unidad 3 de 4</span>
+                    <span>12/18 Módulos</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Módulo Activo y Tarjeta de Racha */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Etapa actual */}
+              <div className="lg:col-span-2 rounded-3xl bg-[#006948] text-white p-6 sm:p-8 relative overflow-hidden shadow-md flex flex-col justify-between">
+                <div className="relative z-10">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <span className="px-3 py-1 rounded-lg bg-[#00855d] text-emerald-50 text-xs font-bold uppercase tracking-wide">
+                      Etapa Actual
+                    </span>
+                    <span className="text-[#85f8c4] text-xs font-semibold">• Módulo Activo #4</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-snug">
+                    Identidades Trigonométricas Avanzadas y Despeje de Incógnitas
+                  </h3>
+                  <p className="text-sm text-emerald-50/90 max-w-xl mb-6 leading-relaxed">
+                    Domina la simplificación de expresiones algebraicas trigonométricas aplicadas a problemas de física y geometría jarocha tradicional.
+                  </p>
+                </div>
+
+                <div className="relative z-10 flex flex-wrap items-center gap-4 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => alert('Iniciando sesión guiada de estudio con tu Tutor Socrático...')}
+                    className="min-h-[44px] px-6 py-2.5 rounded-xl bg-white text-[#171d19] font-bold text-sm hover:bg-slate-100 transition-colors shadow-sm flex items-center space-x-2 cursor-pointer"
+                  >
+                    <Play className="w-4 h-4 text-[#006948] fill-[#006948]" />
+                    <span>Continuar Módulo</span>
+                  </button>
+
+                  <div className="flex items-center space-x-2 text-emerald-100 text-xs font-medium">
+                    <Clock className="w-4 h-4 text-[#85f8c4]" />
+                    <span>Tiempo estimado: 45 min restantes</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Estadísticas de Racha */}
+              <div className="rounded-3xl bg-white p-6 shadow-xs border border-slate-100 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-base font-bold text-[#171d19] mb-4 flex items-center">
+                    <TrendingUp className="w-5 h-5 text-[#006948] mr-2" />
+                    Estadísticas de Racha
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3.5 bg-[#eff5ef] rounded-2xl">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
+                          <Flame className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-[#171d19]">Racha Actual</span>
+                          <span className="text-[11px] text-[#3d4a42]">5 días consecutivos</span>
+                        </div>
+                      </div>
+                      <span className="text-xs font-extrabold text-[#9b3e3b] bg-red-50 px-2 py-1 rounded-lg">
+                        Top 10%
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3.5 bg-[#eff5ef] rounded-2xl">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                          <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-[#171d19]">Puntos Jarocha</span>
+                          <span className="text-[11px] text-[#3d4a42]">1,450 XP ganados</span>
+                        </div>
+                      </div>
+                      <span className="text-xs font-extrabold text-[#006948] bg-emerald-50 px-2 py-1 rounded-lg">
+                        +120
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 text-right">
+                  <Link
+                    to="/resultado"
+                    className="text-xs font-bold text-[#006948] hover:underline inline-flex items-center"
+                  >
+                    <span>Ver reporte de diagnóstico</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Link>
+                </div>
+              </div>
+            </section>
+
+            {/* Sección de Actividades Disponibles */}
+            <section className="space-y-4">
+              <div className="flex items-end justify-between">
+                <div>
+                  <span className="text-[#006948] text-xs font-bold uppercase tracking-wider block mb-1">
+                    Práctica recomendada
+                  </span>
+                  <h3 className="text-xl font-bold text-[#171d19]">Actividades Disponibles para este Tema</h3>
+                </div>
+                <span className="text-xs text-[#3d4a42] font-medium hidden sm:block">
+                  4 actividades pendientes
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                {/* Actividad 1: Test */}
+                <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-100 hover:shadow-md transition-all flex flex-col justify-between group">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center font-bold mb-3 group-hover:bg-[#006948] group-hover:text-white transition-colors">
+                      <HelpCircle className="w-6 h-6" />
+                    </div>
+                    <span className="inline-block px-2 py-0.5 rounded bg-[#e9efe9] text-[#3d4a42] text-[10px] font-semibold mb-1.5">
+                      5 Minutos
+                    </span>
+                    <h4 className="font-bold text-[#171d19] text-base mb-1">Test Diagnóstico</h4>
+                    <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
+                      Evaluación rápida de 5 preguntas sobre identidades fundamentales.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/evaluacion')}
+                    className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#006948] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <span>Iniciar Test</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Actividad 2: Flashcards */}
+                <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-100 hover:shadow-md transition-all flex flex-col justify-between group">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-teal-50 text-[#006c49] flex items-center justify-center font-bold mb-3 group-hover:bg-[#006c49] group-hover:text-white transition-colors">
+                      <BookOpen className="w-6 h-6" />
+                    </div>
+                    <span className="inline-block px-2 py-0.5 rounded bg-[#e9efe9] text-[#3d4a42] text-[10px] font-semibold mb-1.5">
+                      Repaso Activo
+                    </span>
+                    <h4 className="font-bold text-[#171d19] text-base mb-1">Flashcards Interactivas</h4>
+                    <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
+                      Memoriza y repasa fórmulas clave con tarjetas deslizantes.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert('Abriendo Flashcards offline...')}
+                    className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#006c49] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <span>Abrir Tarjetas</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Actividad 3: IA Asistida */}
+                <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-100 hover:shadow-md transition-all flex flex-col justify-between group">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-red-50 text-[#9b3e3b] flex items-center justify-center font-bold mb-3 group-hover:bg-[#9b3e3b] group-hover:text-white transition-colors">
+                      <Bot className="w-6 h-6" />
+                    </div>
+                    <span className="inline-block px-2 py-0.5 rounded bg-[#e9efe9] text-[#3d4a42] text-[10px] font-semibold mb-1.5">
+                      IA Asistida
+                    </span>
+                    <h4 className="font-bold text-[#171d19] text-base mb-1">Ejercicios Guiados con IA</h4>
+                    <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
+                      Chat interactivo para resolver paso a paso ecuaciones complejas.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert('Conectando con el Tutor Socrático Jarocho...')}
+                    className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#9b3e3b] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <span>Practicar con IA</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Actividad 4: Reto Semanal */}
+                <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-100 hover:shadow-md transition-all flex flex-col justify-between group">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center font-bold mb-3 group-hover:bg-[#006948] group-hover:text-white transition-colors">
+                      <Award className="w-6 h-6" />
+                    </div>
+                    <span className="inline-block px-2 py-0.5 rounded bg-[#e9efe9] text-[#3d4a42] text-[10px] font-semibold mb-1.5">
+                      Desafío Semanal
+                    </span>
+                    <h4 className="font-bold text-[#171d19] text-base mb-1">Reto Semanal</h4>
+                    <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
+                      Resuelve el problema práctico de trigonometría aplicada y gana insignia.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert('Reto semanal cargado')}
+                    className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#006948] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <span>Ver Reto</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+              </div>
+            </section>
+
+            {/* Historial Reciente y Accesos Rápidos */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Lista de Historial */}
+              <div className="lg:col-span-2 rounded-3xl bg-white p-6 sm:p-8 shadow-xs border border-slate-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-base font-bold text-[#171d19] flex items-center">
+                    <Clock className="w-5 h-5 text-[#006948] mr-2" />
+                    Historial de Actividades Recientes
+                  </h4>
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-bold text-[#006948] hover:underline">
+                    Ver todo
+                  </a>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Item 1 */}
+                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#e9efe9] transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-9 h-9 rounded-xl bg-[#006948] text-white flex items-center justify-center shrink-0">
+                        <Check className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h5 className="text-xs sm:text-sm font-bold text-[#171d19]">
+                          Cuestionario: Ley de Senos y Cosenos
+                        </h5>
+                        <p className="text-[11px] text-[#3d4a42]">Completado ayer • 10/10 aciertos</p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#006948] text-xs font-bold">
+                      100 Pts
+                    </span>
+                  </div>
+
+                  {/* Item 2 */}
+                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#e9efe9] transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-9 h-9 rounded-xl bg-[#006948] text-white flex items-center justify-center shrink-0">
+                        <Check className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h5 className="text-xs sm:text-sm font-bold text-[#171d19]">
+                          Simulador Gráfico: Vectores en el Plano
+                        </h5>
+                        <p className="text-[11px] text-[#3d4a42]">Completado hace 3 días • Práctica libre</p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#006948] text-xs font-bold">
+                      85 Pts
+                    </span>
+                  </div>
+
+                  {/* Item 3 */}
+                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#e9efe9] transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-9 h-9 rounded-xl bg-[#006948] text-white flex items-center justify-center shrink-0">
+                        <Check className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h5 className="text-xs sm:text-sm font-bold text-[#171d19]">
+                          Lectura Teórica: Razones Trigonométricas
+                        </h5>
+                        <p className="text-[11px] text-[#3d4a42]">Completado hace 4 días • 100% leído</p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#006948] text-xs font-bold">
+                      50 Pts
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accesos Rápidos */}
+              <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-xs border border-slate-100 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-base font-bold text-[#171d19] mb-4 flex items-center">
+                    <Sparkles className="w-5 h-5 text-[#006948] mr-2" />
+                    Accesos Rápidos
+                  </h4>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => alert('Abriendo formulario de matemáticas descargable')}
+                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
+                    >
+                      <BookOpen className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
+                      <span className="text-xs font-semibold">Formulario</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => alert('Abriendo calculadora científica integrada')}
+                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
+                    >
+                      <Calculator className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
+                      <span className="text-xs font-semibold">Calculadora</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => alert('Foro comunitario de dudas entre alumnos de Veracruz')}
+                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
+                    >
+                      <MessageSquare className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
+                      <span className="text-xs font-semibold">Foro de Dudas</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => alert('Descargando guías y recursos en PDF para consultar sin conexión')}
+                      className="p-3.5 rounded-2xl bg-[#eff5ef] hover:bg-[#006948] hover:text-white transition-all group flex flex-col items-center text-center cursor-pointer min-h-[44px]"
+                    >
+                      <Download className="w-6 h-6 text-[#006948] group-hover:text-white mb-1.5" />
+                      <span className="text-xs font-semibold">Recursos PDF</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+                  <p className="text-xs text-[#3d4a42] mb-1 font-medium">Próxima sesión con docente</p>
+                  <p className="text-sm font-bold text-[#006948]">Mañana, 10:00 AM</p>
+                </div>
+              </div>
+
+            </section>
+          </div>
+        </main>
+      </div>
+
+      {/* Widget flotante de Soporte IA Socrático */}
+      <aside className="fixed bottom-6 right-6 z-40">
+        <div
+          onClick={() => alert('¡Hola! Soy tu tutor jarocho. Pregúntame sobre cualquier paso que no entiendas.')}
+          className="bg-white rounded-2xl border border-[#bccac0]/30 shadow-xl p-3.5 sm:p-4 flex items-center space-x-3 hover:shadow-2xl transition-all cursor-pointer group select-none"
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#006948] flex items-center justify-center font-bold group-hover:bg-[#006948] group-hover:text-white transition-colors">
+            <Bot className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="block text-[11px] text-[#3d4a42] font-medium">¿Tienes dudas?</span>
+            <span className="text-sm font-bold text-[#171d19] group-hover:text-[#006948] transition-colors">
+              Chat IA apoyo
+            </span>
+          </div>
+        </div>
+      </aside>
+
+      {/* Footer */}
+      <footer className="py-4 text-center text-xs text-slate-400 bg-white border-t border-slate-100">
+        <p>&copy; {new Date().getFullYear()} Aprender a la jarocha &bull; Educación accesible sin conexión</p>
+      </footer>
+    </div>
+  );
+}
