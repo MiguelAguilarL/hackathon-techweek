@@ -23,11 +23,14 @@ import {
   Award
 } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
+import SocraticChatModal from '../components/SocraticChatModal';
 import { MOCK_USER } from '../data/diagnosticData';
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatTopic, setChatTopic] = useState('');
   const [currentUser, setCurrentUser] = useState(MOCK_USER);
   const [evaluationResult, setEvaluationResult] = useState(null);
 
@@ -266,7 +269,10 @@ export default function StudentDashboard() {
                 <div className="relative z-10 flex flex-wrap items-center gap-4 pt-2">
                   <button
                     type="button"
-                    onClick={() => alert('Iniciando sesión guiada de estudio con tu Tutor Socrático...')}
+                    onClick={() => {
+                      setChatTopic('Identidades Trigonométricas Avanzadas y Despeje de Incógnitas');
+                      setChatOpen(true);
+                    }}
                     className="min-h-[44px] px-6 py-2.5 rounded-xl bg-white text-[#171d19] font-bold text-sm hover:bg-slate-100 transition-colors shadow-sm flex items-center space-x-2 cursor-pointer"
                   >
                     <Play className="w-4 h-4 text-[#006948] fill-[#006948]" />
@@ -412,7 +418,10 @@ export default function StudentDashboard() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => alert('Conectando con el Tutor Socrático Jarocho...')}
+                    onClick={() => {
+                      setChatTopic('Ecuaciones y Álgebra Básica');
+                      setChatOpen(true);
+                    }}
                     className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#9b3e3b] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
                   >
                     <span>Practicar con IA</span>
@@ -580,7 +589,10 @@ export default function StudentDashboard() {
       {/* Widget flotante de Soporte IA Socrático */}
       <aside className="fixed bottom-6 right-6 z-40">
         <div
-          onClick={() => alert('¡Hola! Soy tu tutor jarocho. Pregúntame sobre cualquier paso que no entiendas.')}
+          onClick={() => {
+            setChatTopic('');
+            setChatOpen(true);
+          }}
           className="bg-white rounded-2xl border border-[#bccac0]/30 shadow-xl p-3.5 sm:p-4 flex items-center space-x-3 hover:shadow-2xl transition-all cursor-pointer group select-none"
         >
           <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#006948] flex items-center justify-center font-bold group-hover:bg-[#006948] group-hover:text-white transition-colors">
@@ -594,6 +606,20 @@ export default function StudentDashboard() {
           </div>
         </div>
       </aside>
+
+      {/* Modal del Tutor Socrático */}
+      <SocraticChatModal
+        isOpen={chatOpen}
+        onClose={() => setChatOpen(false)}
+        initialTopic={chatTopic}
+        studentProfile={{
+          name: currentUser.name,
+          grade: currentUser.grade,
+          subject: currentUser.subject,
+          level: levelText,
+          city: 'Veracruz'
+        }}
+      />
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-slate-400 bg-white border-t border-slate-100">

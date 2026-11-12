@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, ArrowRight, Sparkles, X, CheckCircle2 } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
+import SocraticChatModal from '../components/SocraticChatModal';
 import { DIAGNOSTIC_QUESTIONS, MOCK_USER } from '../data/diagnosticData';
 import { db } from '../db';
 
@@ -9,6 +10,7 @@ export default function DiagnosticPage() {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(MOCK_USER);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -335,7 +337,7 @@ export default function DiagnosticPage() {
       {/* Widget flotante de Soporte Socrático */}
       <aside className="fixed bottom-6 right-6 z-40">
         <div
-          onClick={() => alert('El tutor socrático estará disponible durante tus sesiones de estudio guiado.')}
+          onClick={() => setChatOpen(true)}
           className="bg-white rounded-2xl border border-slate-200 shadow-xl p-3.5 sm:p-4 flex items-center space-x-3 hover:shadow-2xl transition-all cursor-pointer group select-none"
         >
           <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">
@@ -349,6 +351,20 @@ export default function DiagnosticPage() {
           </div>
         </div>
       </aside>
+
+      {/* Modal del Tutor Socrático */}
+      <SocraticChatModal
+        isOpen={chatOpen}
+        onClose={() => setChatOpen(false)}
+        initialTopic="Preguntas de Diagnóstico de Matemáticas"
+        studentProfile={{
+          name: currentUser.name,
+          grade: currentUser.grade,
+          subject: currentUser.subject,
+          level: 'Evaluación Inicial',
+          city: 'Veracruz'
+        }}
+      />
     </div>
   );
 }
