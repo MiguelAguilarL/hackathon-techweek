@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, GraduationCap, KeyRound } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
 import { MOCK_USER, MOCK_TEACHER } from '../data/diagnosticData';
+import { validateStudentCredentials } from '../services/studentService';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -63,24 +64,44 @@ export default function LoginPage() {
       }
     }
 
-    // Acceso alumno
-    if (
-      (email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() && password === MOCK_USER.password) ||
-      (email.trim().length > 0 && password.length >= 3)
-    ) {
-      const userData = {
-        name: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.name : 'Estudiante Jarocho',
-        email: email.trim(),
-        role: 'student',
-        initials: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.initials : 'EJ',
-        grade: MOCK_USER.grade,
-        subject: MOCK_USER.subject,
-        firstTime: true
-      };
-      localStorage.setItem('currentUser', JSON.stringify(userData));
-      navigate('/evaluacion');
-    } else {
-      setErrorMsg('Credenciales inválidas. Usa las de prueba o escribe una contraseña de al menos 3 dígitos.');
+    // Acceso alumno (validación dinámica contra alumnos registrados por el docente o María)
+    try {
+      const validStudent = await validateStudentCredentials(email, password);
+      if (validStudent) {
+        const userData = {
+          name: validStudent.name,
+          email: validStudent.email,
+          role: 'student',
+          initials: validStudent.initials,
+          grade: validStudent.grade || MOCK_USER.grade,
+          subject: validStudent.subject || MOCK_USER.subject,
+          firstTime: true
+        };
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        navigate('/evaluacion');
+        return;
+      }
+
+      // Fallback genérico si el docente dio una contraseña cualquiera de prueba
+      if (email.trim().length > 0 && password.length >= 3) {
+        const userData = {
+          name: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.name : 'Estudiante Jarocho',
+          email: email.trim(),
+          role: 'student',
+          initials: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.initials : 'EJ',
+          grade: MOCK_USER.grade,
+          subject: MOCK_USER.subject,
+          firstTime: true
+        };
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        navigate('/evaluacion');
+        return;
+      }
+
+      setErrorMsg('Credenciales inválidas. Verifica tu correo y contraseña.');
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Error al verificar las credenciales.');
     }
   };
 

@@ -14,20 +14,28 @@ import {
   LogOut,
   Brain,
   GraduationCap,
-  LayoutDashboard,
-  Filter,
   Bot,
   Edit3,
   PlusCircle,
   FileText,
   Calendar,
   Layers,
-  HelpCircle
+  Trash2,
+  Lock,
+  KeyRound,
+  AlertTriangle
 } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
 import DiagnosticEditorModal from '../components/DiagnosticEditorModal';
-import { MOCK_TEACHER, MOCK_STUDENTS_LIST } from '../data/diagnosticData';
+import StudentModal from '../components/StudentModal';
+import { MOCK_TEACHER } from '../data/diagnosticData';
 import { getActiveDiagnostic, saveDiagnosticExam } from '../services/diagnosticService';
+import {
+  getAllStudentsWithProgress,
+  createStudent,
+  updateStudent,
+  deleteStudent
+} from '../services/studentService';
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -35,15 +43,26 @@ export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState('groups'); // 'groups' | 'diagnostic'
   const [teacher, setTeacher] = useState(MOCK_TEACHER);
 
+  // Estados de estudiantes reales
+  const [studentsList, setStudentsList] = useState([]);
+  const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
+  const [studentToEdit, setStudentToEdit] = useState(null);
+  const [selectedStudentDetail, setSelectedStudentDetail] = useState(null);
+
   // Estados de la evaluación diagnóstica
   const [currentExam, setCurrentExam] = useState(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isNewExamMode, setIsNewExamMode] = useState(false);
 
-  // Estados de grupos y filtros
+  // Filtros y orden
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('Todos los niveles');
   const [sortBy, setSortBy] = useState('Calificación');
+
+  const loadStudents = async () => {
+    const list = await getAllStudentsWithProgress();
+    setStudentsList(list);
+  };
 
   useEffect(() => {
     const raw = localStorage.getItem('currentTeacher');
@@ -55,7 +74,7 @@ export default function TeacherDashboard() {
       }
     }
 
-    // Cargar evaluación activa
+    loadStudents();
     getActiveDiagnostic().then((exam) => setCurrentExam(exam));
   }, []);
 
@@ -64,41 +83,82 @@ export default function TeacherDashboard() {
     navigate('/login');
   };
 
+  // Guardar nuevo estudiante o editar
+  const handleSaveStudent = async (studentData) => {
+    if (studentData.id) {
+      await updateStudent(studentData.id, studentData);
+    } else {
+      await createStudent(studentData);
+    }
+    await loadStudents();
+  };
+
+  // Eliminar estudiante
+  const handleDeleteStudent = async (student) => {
+    const confirmDelete = window.confirm(
+      `¿Estás seguro de que deseas eliminar al estudiante "${student.name}" (${student.email})? Esta acción no se puede deshacer.`
+    );
+    if (confirmDelete) {
+      await deleteStudent(student.id, student.email);
+      await loadStudents();
+      if (selectedStudentDetail?.id === student.id) {
+        setSelectedStudentDetail(null);
+      }
+    }
+  };
+
+  // Guardar evaluación diagnóstica
   const handleSaveExam = async (examData) => {
     const saved = await saveDiagnosticExam(examData);
     setCurrentExam(saved);
     alert('¡Evaluación diagnóstica guardada y activada con éxito para todos los alumnos!');
   };
 
-  const handleOpenModify = () => {
-    setIsNewExamMode(false);
-    setIsEditorOpen(true);
-  };
+  // Métricas reales calculadas
+  const totalStudentsCount = studentsList.length;
+  const completedEvaluations = studentsList.filter((s) => s.hasCompletedDiagnostic);
+  const completedCount = completedEvaluations.length;
+  const completionPercentage =
+    totalStudentsCount > 0 ? Math.round((completedCount / totalStudentsCount) * 100) : 0;
 
-  const handleOpenCreateNew = () => {
-    setIsNewExamMode(true);
-    setIsEditorOpen(true);
-  };
+  const averageSum = completedEvaluations.reduce((acc, s) => acc + (s.average || 0), 0);
+  const realAverage = completedCount > 0 ? (averageSum / completedCount).toFixed(1) : '0.0';
 
-  // Filtrado y búsqueda de alumnos
-  const filteredStudents = MOCK_STUDENTS_LIST.filter((student) => {
-    const matchesSearch =
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesLevel =
-      selectedLevel === 'Todos los niveles' || student.level.toLowerCase() === selectedLevel.toLowerCase();
-
-    return matchesSearch && matchesLevel;
-  }).sort((a, b) => {
-    if (sortBy === 'Calificación') {
-      return b.average - a.average;
+  // Nivel predominante real
+  const levelCounts = completedEvaluations.reduce((acc, s) => {
+    acc[s.level] = (acc[s.level] || 0) + 1;
+    return acc;
+  }, {});
+  let predominantLevel = 'Sin evaluaciones';
+  let maxCount = 0;
+  for (const [lvl, count] of Object.entries(levelCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      predominantLevel = lvl;
     }
-    if (sortBy === 'Nombre (A-Z)') {
-      return a.name.localeCompare(b.name);
-    }
-    return 0;
-  });
+  }
+
+  // Filtrado y búsqueda
+  const filteredStudents = studentsList
+    .filter((student) => {
+      const matchesSearch =
+        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesLevel =
+        selectedLevel === 'Todos los niveles' || student.level.toLowerCase() === selectedLevel.toLowerCase();
+
+      return matchesSearch && matchesLevel;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'Aciertos') {
+        return (b.latestResult?.score || 0) - (a.latestResult?.score || 0);
+      }
+      if (sortBy === 'Nombre (A-Z)') {
+        return a.name.localeCompare(b.name);
+      }
+      return 0;
+    });
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#f5fbf5] text-[#171d19] antialiased selection:bg-emerald-500 selection:text-white">
@@ -225,10 +285,10 @@ export default function TeacherDashboard() {
 
         {/* Contenido Principal */}
         <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-grow">
-          {/* TAB 1: GESTIÓN DE GRUPOS */}
+          {/* TAB 1: GESTIÓN DE GRUPOS (ALUMNOS REALES) */}
           {activeTab === 'groups' && (
             <div className="flex flex-col w-full">
-              {/* Header del contenido y acciones */}
+              {/* Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                 <div>
                   <div className="flex items-center space-x-2 mb-1.5">
@@ -245,16 +305,11 @@ export default function TeacherDashboard() {
                 <div className="flex items-center space-x-2">
                   <button
                     type="button"
-                    onClick={() => alert('Generando y exportando reporte de diagnóstico del grupo...')}
-                    className="min-h-[44px] px-4 py-2 bg-white text-[#171d19] hover:bg-slate-100 transition-colors rounded-xl text-xs font-bold flex items-center space-x-2 shadow-xs border border-slate-200 cursor-pointer"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Exportar Reporte</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => alert('Formulario para inscribir un nuevo alumno al grupo')}
-                    className="min-h-[44px] px-4 py-2 bg-[#006948] hover:bg-[#00855d] text-white transition-colors rounded-xl text-xs font-bold flex items-center space-x-2 shadow-sm cursor-pointer"
+                    onClick={() => {
+                      setStudentToEdit(null);
+                      setIsStudentModalOpen(true);
+                    }}
+                    className="min-h-[44px] px-5 py-2.5 bg-[#006948] hover:bg-[#00855d] text-white transition-colors rounded-xl text-xs font-bold flex items-center space-x-2 shadow-sm cursor-pointer"
                   >
                     <UserPlus className="w-4 h-4" />
                     <span>Agregar Alumno</span>
@@ -262,7 +317,7 @@ export default function TeacherDashboard() {
                 </div>
               </div>
 
-              {/* Parrilla de Estadísticas */}
+              {/* Parrilla de Estadísticas Reales */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-100 relative overflow-hidden">
                   <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-50 rounded-full pointer-events-none" />
@@ -273,9 +328,11 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-extrabold text-[#171d19]">28</span>
+                    <span className="text-3xl font-extrabold text-[#171d19]">
+                      {totalStudentsCount}
+                    </span>
                     <span className="text-xs text-[#006c49] font-bold flex items-center">
-                      <TrendingUp className="w-3.5 h-3.5 mr-0.5" /> +2 este mes
+                      Registrados
                     </span>
                   </div>
                 </div>
@@ -289,7 +346,7 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
                   <div className="flex items-baseline space-x-1">
-                    <span className="text-3xl font-extrabold text-[#171d19]">8.4</span>
+                    <span className="text-3xl font-extrabold text-[#171d19]">{realAverage}</span>
                     <span className="text-xs text-[#3d4a42]">/ 10.0</span>
                   </div>
                 </div>
@@ -303,8 +360,12 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-extrabold text-[#171d19]">26/28</span>
-                    <span className="text-xs text-[#006c49] font-bold">92.8%</span>
+                    <span className="text-3xl font-extrabold text-[#171d19]">
+                      {completedCount}/{totalStudentsCount}
+                    </span>
+                    <span className="text-xs text-[#006c49] font-bold">
+                      {completionPercentage}%
+                    </span>
                   </div>
                 </div>
 
@@ -317,7 +378,9 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-2xl font-extrabold text-[#171d19]">Intermedio</span>
+                    <span className="text-xl sm:text-2xl font-extrabold text-[#171d19]">
+                      {predominantLevel}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -347,6 +410,7 @@ export default function TeacherDashboard() {
                     <option value="Avanzado">Avanzado</option>
                     <option value="Intermedio">Intermedio</option>
                     <option value="Básico">Básico</option>
+                    <option value="Sin evaluación">Sin evaluación</option>
                   </select>
 
                   <select
@@ -354,175 +418,218 @@ export default function TeacherDashboard() {
                     onChange={(e) => setSortBy(e.target.value)}
                     className="min-h-[44px] px-3 py-2 bg-[#eff5ef] rounded-xl text-xs sm:text-sm text-[#171d19] border-transparent focus:outline-hidden cursor-pointer"
                   >
-                    <option value="Calificación">Ordenar por: Calificación</option>
-                    <option value="Nombre (A-Z)">Nombre (A-Z)</option>
+                    <option value="Nombre (A-Z)">Ordenar por: Nombre (A-Z)</option>
+                    <option value="Aciertos">Más Aciertos</option>
                   </select>
                 </div>
 
                 <div className="text-xs text-[#3d4a42]">
-                  Mostrando <strong className="text-[#171d19]">{filteredStudents.length}</strong> de <strong className="text-[#171d19]">28</strong> estudiantes
+                  Mostrando <strong className="text-[#171d19]">{filteredStudents.length}</strong> de <strong className="text-[#171d19]">{totalStudentsCount}</strong> estudiantes
                 </div>
               </div>
 
-              {/* Tabla de Alumnos */}
+              {/* Tabla de Alumnos Reales */}
               <div className="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden mb-6">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-[#eff5ef] text-[#3d4a42] text-[11px] uppercase tracking-wider font-semibold">
                         <th className="py-3.5 px-4">Alumno</th>
-                        <th className="py-3.5 px-4">Nivel</th>
-                        <th className="py-3.5 px-4 text-center">Promedio</th>
-                        <th className="py-3.5 px-4 text-center">Álgebra</th>
-                        <th className="py-3.5 px-4 text-center">Geometría</th>
-                        <th className="py-3.5 px-4 text-center">Ecuaciones</th>
-                        <th className="py-3.5 px-4 text-center">Trigonometría</th>
+                        <th className="py-3.5 px-4">Nivel Detectado</th>
+                        <th className="py-3.5 px-4 text-center">Aciertos Reales</th>
+                        <th className="py-3.5 px-4 text-center">Diagnóstico</th>
                         <th className="py-3.5 px-4 text-right">Acciones</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#eff5ef] text-sm text-[#171d19]">
-                      {filteredStudents.map((st) => {
-                        let badgeColor = 'bg-slate-100 text-slate-700';
-                        if (st.level === 'Avanzado') badgeColor = 'bg-emerald-100 text-[#006948]';
-                        if (st.level === 'Intermedio') badgeColor = 'bg-teal-100 text-teal-800';
-                        if (st.level === 'Básico') badgeColor = 'bg-amber-100 text-amber-900';
+                      {filteredStudents.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-xs text-slate-400">
+                            No se encontraron estudiantes con los filtros seleccionados.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredStudents.map((st) => {
+                          let badgeColor = 'bg-slate-100 text-slate-700';
+                          if (st.level === 'Avanzado') badgeColor = 'bg-emerald-100 text-[#006948]';
+                          if (st.level === 'Intermedio') badgeColor = 'bg-teal-100 text-teal-800';
+                          if (st.level === 'Básico') badgeColor = 'bg-amber-100 text-amber-900';
 
-                        return (
-                          <tr key={st.id} className="hover:bg-[#f5fbf5] transition-colors">
-                            <td className="py-3.5 px-4">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-9 h-9 rounded-full bg-[#006948] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                                  {st.initials}
+                          return (
+                            <tr key={st.id} className="hover:bg-[#f5fbf5] transition-colors">
+                              <td className="py-3.5 px-4">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-9 h-9 rounded-full bg-[#006948] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                                    {st.initials}
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold text-[#171d19] text-xs sm:text-sm">
+                                      {st.name}
+                                    </div>
+                                    <div className="text-[11px] text-[#3d4a42]">{st.email}</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <div className="font-semibold text-[#171d19] text-xs sm:text-sm">{st.name}</div>
-                                  <div className="text-[11px] text-[#3d4a42]">{st.email}</div>
-                                </div>
-                              </div>
-                            </td>
+                              </td>
 
-                            <td className="py-3.5 px-4">
-                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeColor}`}>
-                                {st.level}
-                              </span>
-                            </td>
+                              <td className="py-3.5 px-4">
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeColor}`}>
+                                  {st.level}
+                                </span>
+                              </td>
 
-                            <td className="py-3.5 px-4 text-center">
-                              <span className="font-bold text-[#006948]">{st.average}</span>
-                            </td>
+                              <td className="py-3.5 px-4 text-center">
+                                <span className="text-xs font-semibold text-slate-700">
+                                  {st.scoreRatio ? `${st.scoreRatio} aciertos` : 'Sin intentos'}
+                                </span>
+                              </td>
 
-                            <td className="py-3.5 px-4 text-center">
-                              <div className="inline-flex flex-col items-center">
+                              <td className="py-3.5 px-4 text-center">
                                 <span
-                                  className={`w-2.5 h-2.5 rounded-full mb-1 ${
-                                    st.algebra.status === 'success' ? 'bg-[#006c49]' : 'bg-red-500'
-                                  }`}
-                                />
-                                <span className="text-[11px] text-[#3d4a42]">{st.algebra.attempts}</span>
-                              </div>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-center">
-                              <div className="inline-flex flex-col items-center">
-                                <span
-                                  className={`w-2.5 h-2.5 rounded-full mb-1 ${
-                                    st.geometria.status === 'success'
-                                      ? 'bg-[#006c49]'
-                                      : st.geometria.status === 'error'
-                                      ? 'bg-red-500'
-                                      : 'bg-slate-300'
-                                  }`}
-                                />
-                                <span
-                                  className={`text-[11px] ${
-                                    st.geometria.status === 'error' ? 'text-red-600 font-bold' : 'text-[#3d4a42]'
+                                  className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                                    st.hasCompletedDiagnostic
+                                      ? 'bg-emerald-50 text-emerald-800'
+                                      : 'bg-amber-50 text-amber-800'
                                   }`}
                                 >
-                                  {st.geometria.attempts}
+                                  {st.hasCompletedDiagnostic ? (
+                                    <>
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                      <span>Completada</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                                      <span>Pendiente</span>
+                                    </>
+                                  )}
                                 </span>
-                              </div>
-                            </td>
+                              </td>
 
-                            <td className="py-3.5 px-4 text-center">
-                              <div className="inline-flex flex-col items-center">
-                                <span
-                                  className={`w-2.5 h-2.5 rounded-full mb-1 ${
-                                    st.ecuaciones.status === 'success' ? 'bg-[#006c49]' : 'bg-slate-300'
-                                  }`}
-                                />
-                                <span className="text-[11px] text-[#3d4a42]">{st.ecuaciones.attempts}</span>
-                              </div>
-                            </td>
+                              <td className="py-3.5 px-4 text-right">
+                                <div className="inline-flex items-center gap-1 justify-end">
+                                  {/* Ver detalle */}
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedStudentDetail(st)}
+                                    className="p-2 text-[#3d4a42] hover:text-[#006948] transition-colors rounded-lg hover:bg-slate-100 cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                                    title="Ver progreso y respuestas del alumno"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </button>
 
-                            <td className="py-3.5 px-4 text-center">
-                              <div className="inline-flex flex-col items-center">
-                                <span
-                                  className={`w-2.5 h-2.5 rounded-full mb-1 ${
-                                    st.trigonometria.status === 'success' ? 'bg-[#006c49]' : 'bg-slate-300'
-                                  }`}
-                                />
-                                <span className="text-[11px] text-[#3d4a42]">{st.trigonometria.attempts}</span>
-                              </div>
-                            </td>
+                                  {/* Modificar / Editar */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setStudentToEdit(st);
+                                      setIsStudentModalOpen(true);
+                                    }}
+                                    className="p-2 text-slate-600 hover:text-blue-700 transition-colors rounded-lg hover:bg-blue-50 cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                                    title="Modificar alumno y contraseña"
+                                  >
+                                    <Edit3 className="w-4 h-4" />
+                                  </button>
 
-                            <td className="py-3.5 px-4 text-right">
-                              <button
-                                type="button"
-                                onClick={() => alert(`Visualizando detalles y reporte individual de ${st.name}`)}
-                                className="p-2 text-[#3d4a42] hover:text-[#006948] transition-colors rounded-lg hover:bg-slate-100 cursor-pointer min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
-                                title="Ver detalle"
-                              >
-                                <Eye className="w-5 h-5" />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                  {/* Borrar */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteStudent(st)}
+                                    className="p-2 text-slate-400 hover:text-red-700 transition-colors rounded-lg hover:bg-red-50 cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                                    title="Eliminar estudiante"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
 
-                {/* Paginación */}
                 <div className="p-4 bg-[#eff5ef] flex items-center justify-between border-t border-slate-100 text-xs text-[#3d4a42]">
-                  <span>Mostrando 1-{filteredStudents.length} de 28 alumnos</span>
-                  <div className="flex items-center space-x-1">
-                    <button
-                      disabled
-                      className="px-3 py-1.5 bg-white text-slate-400 rounded-lg shadow-2xs border border-slate-200 cursor-not-allowed"
-                    >
-                      Anterior
-                    </button>
-                    <button className="px-3 py-1.5 bg-[#006948] text-white rounded-lg shadow-2xs font-bold">
-                      1
-                    </button>
-                    <button
-                      onClick={() => alert('Página 2')}
-                      className="px-3 py-1.5 bg-white text-[#171d19] rounded-lg shadow-2xs border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                    >
-                      2
-                    </button>
-                    <button
-                      onClick={() => alert('Página 3')}
-                      className="px-3 py-1.5 bg-white text-[#171d19] rounded-lg shadow-2xs border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                    >
-                      3
-                    </button>
-                    <button
-                      onClick={() => alert('Siguiente página')}
-                      className="px-3 py-1.5 bg-white text-[#171d19] rounded-lg shadow-2xs border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                    >
-                      Siguiente
-                    </button>
-                  </div>
+                  <span>Total en este grupo: {totalStudentsCount} alumno(s)</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudentToEdit(null);
+                      setIsStudentModalOpen(true);
+                    }}
+                    className="text-xs font-bold text-[#006948] hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Registrar otro alumno</span>
+                  </button>
                 </div>
               </div>
+
+              {/* Panel de Detalle del Alumno Seleccionado */}
+              {selectedStudentDetail && (
+                <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#006948] text-white flex items-center justify-center font-bold text-sm">
+                        {selectedStudentDetail.initials}
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-[#171d19]">
+                          Historial de Actividades: {selectedStudentDetail.name}
+                        </h4>
+                        <p className="text-xs text-[#3d4a42]">{selectedStudentDetail.email}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedStudentDetail(null)}
+                      className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {selectedStudentDetail.latestResult ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                      <div className="bg-[#eff5ef] p-4 rounded-xl">
+                        <span className="text-xs text-slate-500 block">Puntaje Obtenido</span>
+                        <span className="text-xl font-bold text-[#006948]">
+                          {selectedStudentDetail.latestResult.score} /{' '}
+                          {selectedStudentDetail.latestResult.total} aciertos
+                        </span>
+                      </div>
+                      <div className="bg-[#eff5ef] p-4 rounded-xl">
+                        <span className="text-xs text-slate-500 block">Nivel Asignado</span>
+                        <span className="text-xl font-bold text-[#006948]">
+                          {selectedStudentDetail.level}
+                        </span>
+                      </div>
+                      <div className="bg-[#eff5ef] p-4 rounded-xl">
+                        <span className="text-xs text-slate-500 block">Fecha de Realización</span>
+                        <span className="text-xs font-bold text-slate-700">
+                          {new Date(
+                            selectedStudentDetail.latestResult.completedAt || selectedStudentDetail.latestResult.createdAt
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-amber-50 rounded-xl text-xs text-amber-900 border border-amber-200 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>
+                        Este estudiante aún no ha completado su evaluación diagnóstica. Cuando inicie sesión con su correo y contraseña, sus resultados se sincronizarán aquí automáticamente.
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
           {/* TAB 2: GESTIÓN DE EVALUACIÓN DIAGNÓSTICA */}
           {activeTab === 'diagnostic' && currentExam && (
             <div className="flex flex-col w-full space-y-6">
-              {/* Encabezado de la Sección de Evaluación */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center space-x-2 mb-1.5">
@@ -538,11 +645,13 @@ export default function TeacherDashboard() {
                   </h2>
                 </div>
 
-                {/* Acciones principales: Modificar vs Crear Nueva */}
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    onClick={handleOpenModify}
+                    onClick={() => {
+                      setIsNewExamMode(false);
+                      setIsEditorOpen(true);
+                    }}
                     className="min-h-[44px] px-4 py-2 bg-white text-[#171d19] hover:bg-slate-100 transition-colors rounded-xl text-xs font-bold flex items-center space-x-2 shadow-xs border border-slate-200 cursor-pointer"
                   >
                     <Edit3 className="w-4 h-4 text-[#006948]" />
@@ -551,7 +660,10 @@ export default function TeacherDashboard() {
 
                   <button
                     type="button"
-                    onClick={handleOpenCreateNew}
+                    onClick={() => {
+                      setIsNewExamMode(true);
+                      setIsEditorOpen(true);
+                    }}
                     className="min-h-[44px] px-4 py-2 bg-[#006948] hover:bg-[#00855d] text-white transition-colors rounded-xl text-xs font-bold flex items-center space-x-2 shadow-sm cursor-pointer"
                   >
                     <PlusCircle className="w-4 h-4" />
@@ -600,7 +712,7 @@ export default function TeacherDashboard() {
                 </div>
               </div>
 
-              {/* Lista Detallada de Preguntas en Curso */}
+              {/* Lista Detallada de Preguntas */}
               <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-slate-100 space-y-6">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                   <div>
@@ -632,7 +744,6 @@ export default function TeacherDashboard() {
                         </span>
                       </div>
 
-                      {/* 4 Opciones */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 pl-2">
                         {q.options?.map((opt) => {
                           const isCorrect = q.correctAnswer === opt.key;
@@ -671,6 +782,17 @@ export default function TeacherDashboard() {
         </main>
       </div>
 
+      {/* Modal para Crear / Editar Alumno */}
+      <StudentModal
+        isOpen={isStudentModalOpen}
+        onClose={() => {
+          setIsStudentModalOpen(false);
+          setStudentToEdit(null);
+        }}
+        onSave={handleSaveStudent}
+        studentToEdit={studentToEdit}
+      />
+
       {/* Modal de Creación / Modificación de la Evaluación Diagnóstica */}
       <DiagnosticEditorModal
         isOpen={isEditorOpen}
@@ -679,24 +801,6 @@ export default function TeacherDashboard() {
         onSave={handleSaveExam}
         isNewMode={isNewExamMode}
       />
-
-      {/* Widget flotante de Soporte IA */}
-      <aside className="fixed bottom-6 right-6 z-40">
-        <div
-          onClick={() => alert('Asistente docente: Consulta analítica sobre el rendimiento y temas con mayor rezago del grupo.')}
-          className="bg-white rounded-2xl border border-[#bccac0]/30 shadow-xl p-3.5 sm:p-4 flex items-center space-x-3 hover:shadow-2xl transition-all cursor-pointer group select-none"
-        >
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#006948] flex items-center justify-center font-bold group-hover:bg-[#006948] group-hover:text-white transition-colors">
-            <Bot className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="block text-[11px] text-[#3d4a42] font-medium">¿Tienes dudas?</span>
-            <span className="text-sm font-bold text-[#171d19] group-hover:text-[#006948] transition-colors">
-              Chat IA apoyo
-            </span>
-          </div>
-        </div>
-      </aside>
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-slate-400 bg-white border-t border-slate-100">

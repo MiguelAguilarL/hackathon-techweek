@@ -1,7 +1,7 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
-* **Objetivo actual:** Implementación de Flashcards Interactivas estilo NotebookLM con agente dedicado en Python (`agente_flashcards.py`), adaptadas al nivel del estudiante en ecuaciones lineales.
+* **Objetivo actual:** Modificación del Dashboard Docente para operar exclusivamente con datos reales de alumnos y progreso, CRUD completo de estudiantes (crear con modal, editar, eliminar) y contraseñas asignadas por el profesor.
 * **Fase:** Prototipado / Desarrollo UI e Integración con IA (Mobile-First & PWA).
 
 ---
@@ -23,7 +23,8 @@ hackathon-techweek/
 │   │   ├── ConnectivityBanner.jsx
 │   │   ├── DiagnosticEditorModal.jsx
 │   │   ├── InteractiveFlashcardsModal.jsx
-│   │   └── SocraticChatModal.jsx
+│   │   ├── SocraticChatModal.jsx
+│   │   └── StudentModal.jsx
 │   ├── data/
 │   │   └── diagnosticData.js
 │   ├── db/
@@ -39,7 +40,8 @@ hackathon-techweek/
 │   ├── services/
 │   │   ├── chatService.js
 │   │   ├── diagnosticService.js
-│   │   └── flashcardsService.js
+│   │   ├── flashcardsService.js
+│   │   └── studentService.js
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
@@ -61,18 +63,20 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-### [Iteración 7] - 11/11/2026
+### [Iteración 8] - 12/11/2026
 * **Hecho:** 
-  * Se creó [agente_flashcards.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/agente_flashcards.py) como agente autónomo en Python que genera flashcards adaptadas pedagógicamente por nivel (**básico**, **intermedio**, **avanzado**) sobre ecuaciones lineales a partir del PDF de la materia.
-  * Se actualizó [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) exponiendo el endpoint `POST /api/flashcards`.
-  * Se implementó el servicio [flashcardsService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/flashcardsService.js) con caché local para disponibilidad offline.
-  * Se diseñó el componente [InteractiveFlashcardsModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/InteractiveFlashcardsModal.jsx) con estética NotebookLM: efecto 3D flip al tocar o presionar espacio, selector de nivel, pistas desplegables, contador de progreso, marcado de dominio y atajos de teclado.
-  * Se conectó la tarjeta **"Flashcards Interactivas"** de [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) para abrir el modal precargando el nivel del diagnóstico del alumno.
-  * Se verificó la compilación de producción con `pnpm build` sin errores.
+  * Se implementó [studentService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/studentService.js) y se actualizó [db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js) (esquema v3) para gestionar alumnos reales con persistencia dual en `Dexie.js` y `localStorage`.
+  * Se creó [StudentModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/StudentModal.jsx) para registrar y modificar alumnos con: **Nombre**, **Correo** y **Contraseña** asignada por el docente.
+  * Se refactorizó [TeacherDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/TeacherDashboard.jsx) eliminando la lista simulada de 28 alumnos:
+    * Ahora muestra únicamente a los alumnos reales registrados (iniciando con **María Rodríguez** y los que cree el profesor).
+    * Cálculo en tiempo real de métricas: total de alumnos, promedio general, evaluaciones completadas y nivel predominante.
+    * Acciones directas por fila: **Editar** (nombre, correo, contraseña), **Eliminar** (con confirmación) y **Ver detalle** (panel con respuestas, puntaje y fecha del diagnóstico).
+  * Se actualizó [LoginPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/LoginPage.jsx) para validar dinámicamente las credenciales creadas por el docente mediante `validateStudentCredentials`.
+  * Se verificó la compilación de producción con `pnpm build` sin ningún error.
 * **Archivos modificados/creados:**
-  * `agente_flashcards.py`
-  * `server.py`
-  * `src/services/flashcardsService.js`
-  * `src/components/InteractiveFlashcardsModal.jsx`
-  * `src/pages/StudentDashboard.jsx`
+  * `src/db/index.js`
+  * `src/services/studentService.js`
+  * `src/components/StudentModal.jsx`
+  * `src/pages/TeacherDashboard.jsx`
+  * `src/pages/LoginPage.jsx`
   * `HISTORIAL.md`

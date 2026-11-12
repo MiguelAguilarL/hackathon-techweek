@@ -12,3 +12,9 @@ db.version(2).stores({
   evaluationResults: '++id, userId, email, score, total, answers, feedback, createdAt',
   activeDiagnostics: '++id, title, subject, grade, isActive, updatedAt'
 });
+
+db.version(3).stores({
+  users: '++id, email, password, name, role, createdAt',
+  evaluationResults: '++id, userId, email, score, total, answers, feedback, createdAt',
+  activeDiagnostics: '++id, title, subject, grade, isActive, updatedAt'
+});
