@@ -64,20 +64,17 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-### [Iteración 8] - 12/11/2026
-* **Hecho:** 
-  * Se implementó [studentService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/studentService.js) y se actualizó [db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js) (esquema v3) para gestionar alumnos reales con persistencia dual en `Dexie.js` y `localStorage`.
-  * Se creó [StudentModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/StudentModal.jsx) para registrar y modificar alumnos con: **Nombre**, **Correo** y **Contraseña** asignada por el docente.
-  * Se refactorizó [TeacherDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/TeacherDashboard.jsx) eliminando la lista simulada de 28 alumnos:
-    * Ahora muestra únicamente a los alumnos reales registrados (iniciando con **María Rodríguez** y los que cree el profesor).
-    * Cálculo en tiempo real de métricas: total de alumnos, promedio general, evaluaciones completadas y nivel predominante.
-    * Acciones directas por fila: **Editar** (nombre, correo, contraseña), **Eliminar** (con confirmación) y **Ver detalle** (panel con respuestas, puntaje y fecha del diagnóstico).
-  * Se actualizó [LoginPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/LoginPage.jsx) para validar dinámicamente las credenciales creadas por el docente mediante `validateStudentCredentials`.
-  * Se verificó la compilación de producción con `pnpm build` sin ningún error.
+### [Iteración 10] - 12/11/2026
+* **Hecho:**
+  * Integración completa de [agente_profesor.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/agente_profesor.py) con el sistema:
+    * Endpoint en [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) (`POST /api/guided-exercises`) para invocar `generar_respuesta(tipo)`.
+    * Servicio frontend [guidedExercisesService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/guidedExercisesService.js) con validación estricta de conectividad (sin fallbacks offline, 100% generado por IA en vivo).
+    * Modal interactivo [AIGuidedExercisesModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/AIGuidedExercisesModal.jsx) con selección de tipo de preguntas (Opción múltiple, V/F, Completar), resolución paso a paso, validación en vivo y botón permanente "Pedir Pista con IA".
+    * Integración con [SocraticChatModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/SocraticChatModal.jsx) para guiar al estudiante socráticamente sin darle la respuesta directa.
+    * Conexión en [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) a través del botón "Practicar con IA".
 * **Archivos modificados/creados:**
-  * `src/db/index.js`
-  * `src/services/studentService.js`
-  * `src/components/StudentModal.jsx`
-  * `src/pages/TeacherDashboard.jsx`
-  * `src/pages/LoginPage.jsx`
+  * `server.py`
+  * `src/services/guidedExercisesService.js`
+  * `src/components/AIGuidedExercisesModal.jsx`
+  * `src/pages/StudentDashboard.jsx`
   * `HISTORIAL.md`

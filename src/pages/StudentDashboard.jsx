@@ -25,6 +25,7 @@ import {
 import ConnectivityBanner from '../components/ConnectivityBanner';
 import SocraticChatModal from '../components/SocraticChatModal';
 import InteractiveFlashcardsModal from '../components/InteractiveFlashcardsModal';
+import AIGuidedExercisesModal from '../components/AIGuidedExercisesModal';
 import { MOCK_USER } from '../data/diagnosticData';
 
 export default function StudentDashboard() {
@@ -33,6 +34,7 @@ export default function StudentDashboard() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatTopic, setChatTopic] = useState('');
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
+  const [guidedExercisesOpen, setGuidedExercisesOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(MOCK_USER);
   const [evaluationResult, setEvaluationResult] = useState(null);
 
@@ -351,10 +353,7 @@ export default function StudentDashboard() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      setChatTopic('Ecuaciones y Álgebra Básica');
-                      setChatOpen(true);
-                    }}
+                    onClick={() => setGuidedExercisesOpen(true)}
                     className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#9b3e3b] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
                   >
                     <span>Practicar con IA</span>
@@ -440,6 +439,16 @@ export default function StudentDashboard() {
         isOpen={flashcardsOpen}
         onClose={() => setFlashcardsOpen(false)}
         initialLevel={levelText}
+      />
+
+      {/* Modal de Ejercicios Guiados por IA (Groq Qwen en vivo) */}
+      <AIGuidedExercisesModal
+        isOpen={guidedExercisesOpen}
+        onClose={() => setGuidedExercisesOpen(false)}
+        onOpenSocraticChat={(promptText) => {
+          setChatTopic(promptText);
+          setChatOpen(true);
+        }}
       />
 
       {/* Footer */}

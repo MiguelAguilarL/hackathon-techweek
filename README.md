@@ -166,7 +166,6 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `HISTORIAL.md`
 
 ### [Iteración 8] - 12/11/2026
-<<<<<<< HEAD
 * **Hecho:** 
   * Se implementó [studentService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/studentService.js) y se actualizó [db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js) (esquema v3) para gestionar alumnos reales con persistencia dual en `Dexie.js` y `localStorage`.
   * Se creó [StudentModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/StudentModal.jsx) para registrar y modificar alumnos con: **Nombre**, **Correo** y **Contraseña** asignada por el docente.
@@ -183,7 +182,7 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `src/pages/TeacherDashboard.jsx`
   * `src/pages/LoginPage.jsx`
   * `HISTORIAL.md`
-=======
+
 * **Hecho:**
   * Se adaptó [agente_profesor.py](agente_profesor.py) para que genere cuestionarios dirigidos al **estudiante**: recibe solo el tipo elegido y produce **exactamente 5 preguntas** sobre **ecuaciones de primer grado** (único tema permitido).
   * Tipos: `opcion_multiple` (4 opciones / 1 correcta), `verdadero_falso` ("Verdadero" / "Falso") y `completar_respuesta` (espacio en blanco + 4 opciones).
@@ -198,9 +197,27 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * Exponer el agente en `server.py` y consumirlo desde el frontend para abrir el cuestionario desde el dashboard del estudiante.
 
 ### [Iteración 9] - 12/11/2026
+* **Hecho:** 
+  * Se eliminaron las columnas de **Calificación** y **Contraseña** de la tabla de alumnos en [TeacherDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/TeacherDashboard.jsx) atendiendo al principio de privacidad y relevancia de datos.
+  * La contraseña permanece segura y sólo es editable/creable dentro de su modal administrativo, nunca expuesta en la tabla.
+* **Archivos modificados:**
+  * `src/pages/TeacherDashboard.jsx`
+  * `HISTORIAL.md`
+
+### [Iteración 10] - 12/11/2026
 * **Hecho:**
-  * `generar_respuesta(tipo)` devuelve el **dict nativo** directamente con `model_dump()` (sin `json.loads` ni archivos JSON).
-  * Se cambió a `with_structured_output(..., method="json_mode")`: con tool-calling fallaba ~50%; con json_mode salió **15/15** preguntas correctas.
-  * `temperature` bajada a 0.1 para evitar errores de cuenta en Verdadero/Falso.
-* **Archivos modificados/creados:** `agente_profesor.py`, `HISTORIAL.md`, `README.md`
->>>>>>> 947849effc7337e9c5f87cea3d578ecc2937ebc6
+  * Integración completa de [agente_profesor.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/agente_profesor.py) con el sistema:
+    * Endpoint en [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) (`POST /api/guided-exercises`) para invocar `generar_respuesta(tipo)`.
+    * Servicio frontend [guidedExercisesService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/guidedExercisesService.js) con validación estricta de conectividad (sin fallbacks offline, 100% generado por IA en vivo).
+    * Modal interactivo [AIGuidedExercisesModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/AIGuidedExercisesModal.jsx) con selección de tipo de preguntas (Opción múltiple, V/F, Completar), resolución paso a paso, validación en vivo y botón permanente "Pedir Pista con IA".
+    * Integración con [SocraticChatModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/SocraticChatModal.jsx) para guiar al estudiante socráticamente sin darle la respuesta directa.
+    * Conexión en [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) a través del botón "Practicar con IA".
+* **Archivos modificados/creados:**
+  * `server.py`
+  * `src/services/guidedExercisesService.js`
+  * `src/components/AIGuidedExercisesModal.jsx`
+  * `src/pages/StudentDashboard.jsx`
+  * `HISTORIAL.md`
+
+
+

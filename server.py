@@ -11,6 +11,9 @@ from agente import agente, Contexto
 # Importamos el generador de flashcards
 from agente_flashcards import generar_flashcards
 
+# Importamos el generador de cuestionarios guiados con IA
+from agente_profesor import generar_respuesta
+
 app = FastAPI(title="Tutor Socrático Jarocho API", version="1.0.0")
 
 # Habilitamos CORS para Vite (localhost:5173 o cualquier host local)
@@ -42,6 +45,9 @@ class FlashcardsRequest(BaseModel):
     nivel: Optional[str] = "intermedio" # "basico" | "intermedio" | "avanzado"
     tema: Optional[str] = "ecuaciones lineales"
 
+class GuidedExercisesRequest(BaseModel):
+    tipo: str # "opcion_multiple" | "verdadero_falso" | "completar_respuesta"
+
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok", "service": "Tutor Socrático Jarocho"}
@@ -53,7 +59,6 @@ async def chat_endpoint(req: ChatRequest):
 
         historial = []
 
-        # Inyectamos contexto del alumno si viene proporcionado en el primer mensaje
         if req.profile:
             prefacio_contexto = (
                 f"[Perfil del Alumno]\n"
@@ -71,7 +76,6 @@ async def chat_endpoint(req: ChatRequest):
             else:
                 historial.append(AIMessage(content=msg.content))
 
-        # Invocamos el agente existente de agente.py
         respuesta = agente.invoke({"messages": historial}, context=contexto_alumno)
         mensajes_resultado = respuesta.get("messages", [])
 
@@ -107,6 +111,23 @@ async def flashcards_endpoint(req: FlashcardsRequest):
     except Exception as e:
         print(f"Error generando flashcards: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/guided-exercises")
+async def guided_exercises_endpoint(req: GuidedExercisesRequest):
+    # Requiere internet y llamada en vivo con Groq (sin fallbacks)
+    try:
+        tipo_solicitado = req.tipo.strip().lower()
+        if tipo_solicitado not in ("opcion_multiple", "verdadero_falso", "completar_respuesta"):
+            tipo_solicitado = "opcion_multiple"
+
+        contenido = generar_respuesta(tipo_solicitado)
+        return contenido
+    except Exception as e:
+        print(f"Error generando ejercicios guiados con Groq: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=f"No se pudo generar el cuestionario con IA: {str(e)}. Verifica tu conexión a internet y tu clave GROQ_API_KEY."
+        )
 
 if __name__ == "__main__":
     import uvicorn
