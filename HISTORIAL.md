@@ -2,7 +2,7 @@
 
 ## 📌 Estado General
 * **Objetivo actual:** Agente docente único (consola) que genera evaluaciones diagnósticas y actividades con Groq.
-* **Fase:** MVP con memoria y salida como diccionario Python — pendiente integración con la web del compañero.
+* **Fase:** MVP con memoria, dict en Python y guardado en `output/contenido_N.json` — pendiente integración con la web del compañero.
 
 ---
 
@@ -112,4 +112,15 @@
 * **Archivos modificados:** `agente_profesor.py`
 * **Commits:** `refactor: devolver diccionario en lugar de guardar JSON`
 * **Contrato para la web:** `resultado = generar_respuesta("petición del profesor")` → dict listo para usar.
+* **Próximos pasos:** integración con la web del compañero.
+
+### [Iteración 8] - 11/11/2026 — VUELTA al guardado en archivo
+* **Hecho:**
+  * Cambio de plan (otra vez): el usuario necesita que el dict se **guarde en archivo**.
+  * Restaurados `import json` y `guardar_json(contenido: dict)` → escribe `output/contenido_N.json` numerado sin sobreescribir (mismo formato de siempre).
+  * El `__main__` la llama solo si `estado == "generado"` (las aclaraciones no guardan).
+  * `generar_respuesta()` sigue regresando el dict (`model_dump()`); el archivo es ese mismo dict serializado.
+  * Prueba OK: actividad de 2 preguntas → `contenido_1.json` con las 7 claves esperadas.
+* **Archivos modificados:** `agente_profesor.py`
+* **Commits:** `feat: volver a guardar el diccionario en output/`
 * **Próximos pasos:** integración con la web del compañero.
