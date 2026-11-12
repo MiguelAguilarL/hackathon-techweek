@@ -1,7 +1,7 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
-* **Objetivo actual:** Modificación del Dashboard Docente para operar exclusivamente con datos reales de alumnos y progreso, CRUD completo de estudiantes (crear con modal, editar, eliminar) y contraseñas asignadas por el profesor.
+* **Objetivo actual:** Implementación de Flashcards Interactivas estilo NotebookLM con agente dedicado en Python (`agente_flashcards.py`), adaptadas al nivel del estudiante en ecuaciones lineales.
 * **Fase:** Prototipado / Desarrollo UI e Integración con IA (Mobile-First & PWA).
 
 ---
@@ -47,6 +47,7 @@ hackathon-techweek/
 │   └── main.jsx
 ├── agente.py                  # Agente Socrático LangChain + Groq (intacto)
 ├── agente_flashcards.py       # Agente especializado en Flashcards
+├── agente_profesor.py         # Agente de cuestionarios para el estudiante (ecuaciones de primer grado)
 ├── server.py                  # API FastAPI puente
 ├── requirements.txt           # Dependencias de Python
 ├── ecuaciones_lineales.pdf    # Material didáctico de apoyo
@@ -80,3 +81,4 @@ hackathon-techweek/
   * `src/pages/TeacherDashboard.jsx`
   * `src/pages/LoginPage.jsx`
   * `HISTORIAL.md`
+

@@ -166,6 +166,7 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `HISTORIAL.md`
 
 ### [Iteración 8] - 12/11/2026
+<<<<<<< HEAD
 * **Hecho:** 
   * Se implementó [studentService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/studentService.js) y se actualizó [db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js) (esquema v3) para gestionar alumnos reales con persistencia dual en `Dexie.js` y `localStorage`.
   * Se creó [StudentModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/StudentModal.jsx) para registrar y modificar alumnos con: **Nombre**, **Correo** y **Contraseña** asignada por el docente.
@@ -182,3 +183,24 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `src/pages/TeacherDashboard.jsx`
   * `src/pages/LoginPage.jsx`
   * `HISTORIAL.md`
+=======
+* **Hecho:**
+  * Se adaptó [agente_profesor.py](agente_profesor.py) para que genere cuestionarios dirigidos al **estudiante**: recibe solo el tipo elegido y produce **exactamente 5 preguntas** sobre **ecuaciones de primer grado** (único tema permitido).
+  * Tipos: `opcion_multiple` (4 opciones / 1 correcta), `verdadero_falso` ("Verdadero" / "Falso") y `completar_respuesta` (espacio en blanco + 4 opciones).
+  * Se conservó la estructura JSON existente del proyecto y la respuesta regresa como **dict nativo de Python** (`json.loads`).
+  * Se eliminó la memoria (checkpointer) y se quitó `response_format`, que fallaba con `tool_use_failed` en `qwen/qwen3.8-27b`.
+  * Verificación: 8/8 corridas válidas con 5 preguntas y el tema correcto.
+* **Archivos modificados/creados:**
+  * `agente_profesor.py`
+  * `HISTORIAL.md`
+  * `README.md`
+* **Próximos pasos sugeridos:**
+  * Exponer el agente en `server.py` y consumirlo desde el frontend para abrir el cuestionario desde el dashboard del estudiante.
+
+### [Iteración 9] - 12/11/2026
+* **Hecho:**
+  * `generar_respuesta(tipo)` devuelve el **dict nativo** directamente con `model_dump()` (sin `json.loads` ni archivos JSON).
+  * Se cambió a `with_structured_output(..., method="json_mode")`: con tool-calling fallaba ~50%; con json_mode salió **15/15** preguntas correctas.
+  * `temperature` bajada a 0.1 para evitar errores de cuenta en Verdadero/Falso.
+* **Archivos modificados/creados:** `agente_profesor.py`, `HISTORIAL.md`, `README.md`
+>>>>>>> 947849effc7337e9c5f87cea3d578ecc2937ebc6
