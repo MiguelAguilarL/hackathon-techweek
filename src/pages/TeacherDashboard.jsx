@@ -34,7 +34,8 @@ import {
   getAllStudentsWithProgress,
   createStudent,
   updateStudent,
-  deleteStudent
+  deleteStudent,
+  resolveAcademicWarning
 } from '../services/studentService';
 
 export default function TeacherDashboard() {
@@ -107,6 +108,19 @@ export default function TeacherDashboard() {
     }
   };
 
+  // Resolver / Marcar advertencia como atendida
+  const handleResolveWarning = async (warningId) => {
+    await resolveAcademicWarning(warningId);
+    const updatedList = await getAllStudentsWithProgress();
+    setStudentsList(updatedList);
+    if (selectedStudentDetail) {
+      const updated = updatedList.find(
+        (s) => s.id === selectedStudentDetail.id || s.email === selectedStudentDetail.email
+      );
+      if (updated) setSelectedStudentDetail(updated);
+    }
+  };
+
   // Guardar evaluación diagnóstica
   const handleSaveExam = async (examData) => {
     const saved = await saveDiagnosticExam(examData);
@@ -120,6 +134,8 @@ export default function TeacherDashboard() {
   const completedCount = completedEvaluations.length;
   const completionPercentage =
     totalStudentsCount > 0 ? Math.round((completedCount / totalStudentsCount) * 100) : 0;
+
+  const totalActiveAlerts = studentsList.reduce((acc, s) => acc + (s.pendingWarningsCount || 0), 0);
 
   const averageSum = completedEvaluations.reduce((acc, s) => acc + (s.average || 0), 0);
   const realAverage = completedCount > 0 ? (averageSum / completedCount).toFixed(1) : '0.0';
@@ -247,14 +263,6 @@ export default function TeacherDashboard() {
               <span>Evaluación Diagnóstica</span>
             </button>
 
-            <Link
-              to="/dashboard"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center px-4 py-2.5 rounded-xl text-[#3d4a42] hover:bg-[#dee4de] transition-colors text-sm font-medium min-h-[44px]"
-            >
-              <GraduationCap className="w-4 h-4 mr-3 text-slate-500" />
-              <span>Vista Alumno</span>
-            </Link>
           </nav>
 
           <div className="space-y-3">
@@ -385,6 +393,25 @@ export default function TeacherDashboard() {
                 </div>
               </div>
 
+              {/* Alerta de Integridad Global si hay avisos pendientes */}
+              {totalActiveAlerts > 0 && (
+                <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700 shrink-0 font-bold">
+                      <AlertTriangle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-amber-900">
+                        {totalActiveAlerts} {totalActiveAlerts === 1 ? 'Aviso de Integridad Académica detectado' : 'Avisos de Integridad Académica detectados'}
+                      </h4>
+                      <p className="text-xs text-amber-800/90">
+                        Se identificaron solicitudes directas de respuestas al Tutor de IA en este grupo. Revisa el perfil del estudiante en la tabla para más información.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Barra de Búsqueda y Filtros */}
               <div className="bg-white p-4 rounded-2xl shadow-xs border border-slate-100 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -438,13 +465,14 @@ export default function TeacherDashboard() {
                         <th className="py-3.5 px-4">Nivel Detectado</th>
                         <th className="py-3.5 px-4 text-center">Aciertos Reales</th>
                         <th className="py-3.5 px-4 text-center">Diagnóstico</th>
+                        <th className="py-3.5 px-4 text-center">Integridad IA</th>
                         <th className="py-3.5 px-4 text-right">Acciones</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#eff5ef] text-sm text-[#171d19]">
                       {filteredStudents.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-xs text-slate-400">
+                          <td colSpan={6} className="py-8 text-center text-xs text-slate-400">
                             No se encontraron estudiantes con los filtros seleccionados.
                           </td>
                         </tr>
@@ -503,6 +531,28 @@ export default function TeacherDashboard() {
                                     </>
                                   )}
                                 </span>
+                              </td>
+
+                              <td className="py-3.5 px-4 text-center">
+                                {st.pendingWarningsCount > 0 ? (
+                                  <span
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs"
+                                    title={`${st.pendingWarningsCount} intento(s) de copia registrado(s)`}
+                                  >
+                                    <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
+                                    <span>{st.pendingWarningsCount} {st.pendingWarningsCount === 1 ? 'aviso' : 'avisos'}</span>
+                                  </span>
+                                ) : st.warningsCount > 0 ? (
+                                  <span
+                                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800"
+                                    title="Avisos atendidos y revisados por el docente"
+                                  >
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>Atendida</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-slate-400 font-medium">Limpio</span>
+                                )}
                               </td>
 
                               <td className="py-3.5 px-4 text-right">
@@ -622,6 +672,90 @@ export default function TeacherDashboard() {
                       </span>
                     </div>
                   )}
+
+                  {/* Sección de Integridad Académica y Alertas de IA */}
+                  <div className="border-t border-slate-100 pt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                        <h5 className="text-sm font-bold text-[#171d19]">
+                          Expediente de Integridad y Alertas de IA ({selectedStudentDetail.warnings?.length || 0})
+                        </h5>
+                      </div>
+                      {selectedStudentDetail.pendingWarningsCount > 0 && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-[11px] font-bold">
+                          {selectedStudentDetail.pendingWarningsCount} pendiente(s) de atención
+                        </span>
+                      )}
+                    </div>
+
+                    {selectedStudentDetail.warnings && selectedStudentDetail.warnings.length > 0 ? (
+                      <div className="space-y-3">
+                        {selectedStudentDetail.warnings.map((w) => (
+                          <div
+                            key={w.id}
+                            className={`p-4 rounded-xl border transition-all ${
+                              w.status === 'pending'
+                                ? 'bg-amber-50/70 border-amber-200'
+                                : 'bg-slate-50 border-slate-200 opacity-80'
+                            }`}
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                    w.status === 'pending'
+                                      ? 'bg-amber-200 text-amber-900'
+                                      : 'bg-emerald-100 text-emerald-800'
+                                  }`}
+                                >
+                                  {w.status === 'pending' ? 'Alerta Pendiente' : 'Revisada con el Alumno'}
+                                </span>
+                                <span className="text-xs text-[#3d4a42]">
+                                  {new Date(w.timestamp).toLocaleString()}
+                                </span>
+                              </div>
+
+                              {w.status === 'pending' ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleResolveWarning(w.id)}
+                                  className="text-xs font-bold text-[#006948] hover:text-[#00855d] bg-white hover:bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 transition-colors cursor-pointer self-start sm:self-auto flex items-center gap-1 shadow-2xs"
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span>Marcar como Revisada</span>
+                                </button>
+                              ) : (
+                                <span className="text-xs text-slate-500 italic">
+                                  Atendida {w.resolvedAt ? `el ${new Date(w.resolvedAt).toLocaleDateString()}` : ''}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="space-y-2 text-xs">
+                              <div className="p-3 bg-white rounded-lg border border-slate-100">
+                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block mb-1">
+                                  Mensaje enviado por el alumno al Chatbot:
+                                </span>
+                                <p className="font-semibold text-slate-800 italic">"{w.query}"</p>
+                              </div>
+
+                              <p className="text-[11px] text-[#3d4a42]">
+                                <strong>Motivo detectado:</strong> {w.reason}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-emerald-50 rounded-xl text-xs text-emerald-900 border border-emerald-200 flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>
+                          <strong>Expediente Limpio:</strong> Este alumno no ha intentado pedir respuestas directas ni hacer trampa con el Tutor de IA.
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

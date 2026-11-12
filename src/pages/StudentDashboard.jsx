@@ -358,6 +358,7 @@ export default function StudentDashboard() {
         initialTopic={chatTopic}
         studentProfile={{
           name: currentUser.name,
+          email: currentUser.email,
           grade: currentUser.grade,
           subject: currentUser.subject,
           level: levelText,

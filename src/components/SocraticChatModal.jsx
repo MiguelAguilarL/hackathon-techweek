@@ -10,10 +10,12 @@ import {
   CheckCircle,
   HelpCircle,
   Loader2,
-  BookOpen
+  BookOpen,
+  AlertTriangle
 } from 'lucide-react';
 import { sendChatMessage, checkChatHealth } from '../services/chatService';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import { recordAcademicWarning } from '../services/studentService';
 import { db } from '../db';
 
 const QUICK_REPLIES = [
@@ -107,10 +109,26 @@ export default function SocraticChatModal({ isOpen, onClose, initialTopic, stude
         profile: studentProfile
       });
 
+      // Si el backend detectó intento de copia o solicitud directa de respuesta
+      if (res?.warning?.detected) {
+        try {
+          await recordAcademicWarning({
+            studentEmail: studentProfile?.email,
+            studentName: studentProfile?.name,
+            query: res.warning.query || text,
+            reason: res.warning.reason,
+            replySnippet: res.reply
+          });
+        } catch (warnErr) {
+          console.warn('Error registrando advertencia académica:', warnErr);
+        }
+      }
+
       const assistantMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: res.reply,
+        hasAcademicWarning: Boolean(res?.warning?.detected),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -220,6 +238,21 @@ export default function SocraticChatModal({ isOpen, onClose, initialTopic, stude
                   }`}
                 >
                   <p className="whitespace-pre-line">{m.content}</p>
+
+                  {m.hasAcademicWarning && (
+                    <div className="mt-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold block text-[11px] uppercase tracking-wide text-amber-800">
+                          Aviso de Integridad Académica
+                        </span>
+                        <span className="text-[11px] leading-tight text-amber-800/90 block mt-0.5">
+                          El tutor socrático no proporciona respuestas directas ni resuelve tareas. Esta consulta fue registrada en tu expediente escolar para seguimiento docente.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   <span
                     className={`block text-[10px] mt-1 text-right ${
                       isUser ? 'text-emerald-200' : 'text-slate-400'

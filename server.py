@@ -1,4 +1,6 @@
 import os
+import re
+from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -15,6 +17,32 @@ from agente_flashcards import generar_flashcards
 from agente_profesor import generar_respuesta
 
 app = FastAPI(title="Tutor Socrático Jarocho API", version="1.0.0")
+
+# Patrones para detectar intentos indebidos de copia o resolución directa
+PATRONES_INTENTO_COPIA = [
+    r"\b(dame|dime|pasa(me)?|cual es|cuál es|quiero)\s+(la\s+)?(respuesta|soluci[oó]n|resultado)\b",
+    r"\b(resuelve|resu[eé]lve(me)?|haz(me)?)\s+(este|esta|el|la|mi)?\s*(ejercicio|problema|tarea|ecuaci[oó]n|examen)?\b",
+    r"\bcu[aá]nto\s+da\b",
+    r"\bsolo\s+(la\s+respuesta|el\s+resultado|dime\s+la\s+respuesta)\b",
+    r"\b(es\s+la\s+[abcd]\b|cu[aá]l\s+(opci[oó]n|inciso)\s+es\b|dime\s+la\s+(opci[oó]n|letra)\b)",
+    r"\b(hazme\s+la\s+tarea|haz\s+mi\s+tarea)\b",
+    r"\b(para\s+copiar|quiero\s+copiar|dejame\s+copiar)\b",
+    r"\b(dame\s+directo|sin\s+explicaci[oó]n|sin\s+pasos)\b",
+]
+
+def detectar_intento_copia(texto: str) -> Optional[dict]:
+    if not texto:
+        return None
+    t_normalizado = texto.lower()
+    for patron in PATRONES_INTENTO_COPIA:
+        if re.search(patron, t_normalizado):
+            return {
+                "detected": True,
+                "reason": "Solicitud de respuesta directa o resolución automática de ejercicio/tarea",
+                "query": texto.strip(),
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+    return None
 
 # Habilitamos CORS para Vite (localhost:5173 o cualquier host local)
 app.add_middleware(
@@ -90,9 +118,18 @@ async def chat_endpoint(req: ChatRequest):
                 for bloque in contenido
             )
 
+        ultimo_texto_usuario = ""
+        for msg in reversed(req.messages):
+            if msg.role == "user":
+                ultimo_texto_usuario = msg.content
+                break
+
+        advertencia = detectar_intento_copia(ultimo_texto_usuario)
+
         return {
             "reply": str(contenido),
-            "role": "assistant"
+            "role": "assistant",
+            "warning": advertencia
         }
 
     except Exception as e:
