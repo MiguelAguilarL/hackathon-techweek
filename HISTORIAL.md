@@ -1,25 +1,49 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
+<<<<<<< HEAD
 * **Objetivo actual:** Agente docente único (consola) que genera evaluaciones diagnósticas y actividades con Groq.
 * **Fase:** MVP con memoria, dict en Python y guardado en `output/contenido_N.json` — pendiente integración con la web del compañero.
+=======
+>>>>>>> 6e668458a238b46aa2c1e25eca6a51893327435b
 
 ---
 
 ## 🌳 Estructura Actual del Proyecto
 ```text
-./
+hackathon-techweek/
+├── public/
+├── references/
+│   ├── evaluacion_diagnostica.html
+│   ├── login.html
+│   └── resultado_evaluacion.html
+├── src/
+│   ├── assets/
+│   ├── components/
+│   │   └── ConnectivityBanner.jsx
+│   ├── data/
+│   │   └── diagnosticData.js
+│   ├── db/
+│   │   └── index.js
+│   ├── hooks/
+│   │   └── useOnlineStatus.js
+│   ├── pages/
+│   │   ├── DiagnosticPage.jsx
+│   │   ├── LoginPage.jsx
+│   │   └── ResultPage.jsx
+│   ├── services/
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── .env                     ← NUEVO (no se sube al repo)
+├── agente.js                ← NUEVO (traducción a JavaScript de agente.py)
+├── agente.py
+├── ecuaciones_lineales.pdf
+├── index.html
+├── package.json
+├── pnpm-lock.yaml
+├── vite.config.js
 ├── AGENTS.md
-├── README.md
-├── HISTORIAL.md
-├── .env.example          ← plantilla de credenciales
-├── .env                  ← clave real de Groq (NO se commitea)
-├── .gitignore            ← ignora .env, .venv/, output/, __pycache__/
-├── requirements.txt
-├── agente_profesor.py    ← AGENTE ÚNICO (LangChain + Groq)
-├── output/               ← JSON generados con uso de tokens (NO se commitea)
-└── .venv/                ← entorno virtual (NO se commitea)
-```
 
 ---
 
@@ -32,11 +56,6 @@
 
 ## 📝 Registro de Cambios
 
-### [Iteración 1] - 11/11/2026 — ETAPA 1: Planificación
-* **Hecho:**
-  * Análisis de requerimientos y plan técnico (agente único vs múltiples; workflow vs agente ReAct).
-  * Decisiones: un solo agente con un system prompt, salida estructurada Pydantic, validación en Python, 1 ronda de reparación, ahorro de tokens.
-* **Próximos pasos:** entorno y conexión con Groq.
 
 ### [Iteración 2] - 11/11/2026 — ETAPA 2: Entorno
 * **Hecho:**

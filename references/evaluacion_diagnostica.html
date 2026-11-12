@@ -1,0 +1,190 @@
+<!DOCTYPE html><html class="h-full bg-slate-50" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Aprender a la jarocha - Evaluación Diagnóstica</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styles">
+    /* Custom font smoothing and transitions */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+<!-- BEGIN: MainHeader -->
+<header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30" data-purpose="top-navigation">
+<div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<!-- App Title -->
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+          AJ
+        </div>
+<h1 class="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+          Aprender a la jarocha
+        </h1>
+</div>
+<!-- Online Status Indicator -->
+<div class="flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+</span>
+<span class="text-xs font-semibold tracking-wider text-emerald-800 uppercase">ONLINE</span>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContentContainer -->
+<main class="max-w-7xl w-full mx-auto px-6 py-8 flex-grow">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+<!-- BEGIN: StudentSidebar -->
+<aside class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sticky top-24" data-purpose="student-profile-sidebar">
+<div class="flex flex-col items-center text-center pb-6 border-b border-slate-100">
+<div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl font-bold mb-3 shadow-inner">
+            MR
+          </div>
+<h2 class="text-lg font-bold text-slate-900">María Rodríguez</h2>
+<span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full mt-1">Estudiante Activo</span>
+</div>
+<div class="mt-6 space-y-4 text-sm">
+<div>
+<span class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Materia</span>
+<p class="font-semibold text-slate-700 mt-0.5">Matemáticas Aplicadas</p>
+</div>
+<div>
+<span class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Grado y grupo</span>
+<p class="font-semibold text-slate-700 mt-0.5">3° "B" Secundaria</p>
+</div>
+<div>
+<span class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Tu nivel de aprendizaje</span>
+<div class="mt-1 flex items-center space-x-1.5">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+<p class="font-semibold text-slate-700">Intermedio</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: StudentSidebar -->
+<!-- BEGIN: EvaluationArea -->
+<section class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-8" data-purpose="evaluation-main-panel">
+<!-- Panel Header & Progress -->
+<div class="mb-8 pb-6 border-b border-slate-100">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold tracking-tight text-slate-900 uppercase">Evaluación Diagnóstica</h2>
+<span class="text-sm font-bold text-emerald-600" id="progress-percentage">0%</span>
+</div>
+<!-- Progress Bar Component -->
+<div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5">
+<div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-300 ease-out" id="progress-bar" style="width: 0%"></div>
+</div>
+</div>
+<!-- Evaluation Form -->
+<form class="space-y-8" id="evaluation-form" onsubmit="event.preventDefault();">
+<!-- Question 1: Multiple Choice -->
+<div class="space-y-4" data-purpose="question-item">
+<h3 class="text-base font-semibold text-slate-800">
+<span class="text-emerald-600 font-bold mr-2">1.</span> Pregunta opción múltiple: ¿Cuál es el resultado de simplificar la expresión algebraica?
+            </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
+<!-- Option A -->
+<label class="flex items-center p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all">
+<input class="text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-slate-300" name="q1" onchange="updateProgress()" type="radio" value="a">
+<span class="ml-3 text-sm font-medium text-slate-700"><span class="font-bold text-slate-400 mr-1.5">a)</span> resp 1</span>
+</label>
+<!-- Option B -->
+<label class="flex items-center p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all">
+<input class="text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-slate-300" name="q1" onchange="updateProgress()" type="radio" value="b">
+<span class="ml-3 text-sm font-medium text-slate-700"><span class="font-bold text-slate-400 mr-1.5">b)</span> resp 2</span>
+</label>
+<!-- Option C -->
+<label class="flex items-center p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all">
+<input class="text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-slate-300" name="q1" onchange="updateProgress()" type="radio" value="c">
+<span class="ml-3 text-sm font-medium text-slate-700"><span class="font-bold text-slate-400 mr-1.5">c)</span> resp 3</span>
+</label>
+<!-- Option D -->
+<label class="flex items-center p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all">
+<input class="text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-slate-300" name="q1" onchange="updateProgress()" type="radio" value="d">
+<span class="ml-3 text-sm font-medium text-slate-700"><span class="font-bold text-slate-400 mr-1.5">d)</span> resp 4</span>
+</label>
+</div>
+</div>
+<!-- Question 2: Open-ended -->
+<div class="space-y-4 pt-4 border-t border-slate-100" data-purpose="question-item">
+<h3 class="text-base font-semibold text-slate-800">
+<span class="text-emerald-600 font-bold mr-2">2.</span> Pregunta abierta: Explica brevemente el procedimiento utilizado.
+            </h3>
+<div class="pl-6">
+<input class="w-full sm:max-w-md px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm placeholder:text-slate-400 outline-none transition-all" id="q2-input" name="q2" oninput="updateProgress()" placeholder="Escribe tu respuesta aquí..." type="text">
+</div>
+</div>
+<!-- Form Actions -->
+<div class="pt-6 border-t border-slate-100 flex items-center justify-end space-x-4">
+
+<button class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-md shadow-emerald-600/20 transition-all" type="submit">
+              Siguiente / Enviar
+            </button>
+</div>
+</form>
+</section>
+<!-- END: EvaluationArea -->
+</div>
+</main>
+<!-- END: MainContentContainer -->
+<!-- BEGIN: AIAssistantWidget -->
+<aside class="fixed bottom-6 right-6 z-40" data-purpose="floating-ai-support">
+<div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 flex items-center space-x-3 hover:shadow-2xl transition-all cursor-pointer group">
+<div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<span class="block text-xs text-slate-400 font-medium">¿Tienes dudas?</span>
+<span class="text-sm font-bold text-slate-800 group-hover:text-teal-600 transition-colors">Chat IA apoyo</span>
+</div>
+</div>
+</aside>
+<!-- END: AIAssistantWidget -->
+<!-- BEGIN: InteractiveScript -->
+<script data-purpose="progress-calculator">
+    function updateProgress() {
+      const q1Answered = document.querySelector('input[name="q1"]:checked') !== null;
+      const q2Input = document.getElementById('q2-input');
+      const q2Answered = q2Input.value.trim().length > 0;
+      
+      let answeredCount = 0;
+      if (q1Answered) answeredCount++;
+      if (q2Answered) answeredCount++;
+      
+      const totalQuestions = 2;
+      const percentage = Math.round((answeredCount / totalQuestions) * 100);
+      
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-percentage');
+      
+      progressBar.style.width = percentage + '%';
+      progressText.textContent = percentage + '%';
+    }
+  </script>
+<!-- END: InteractiveScript -->
+
+
+</body></html>
