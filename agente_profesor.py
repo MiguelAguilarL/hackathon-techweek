@@ -1,5 +1,4 @@
 # Agente profesor para Aprender a la Jarocha - consola con un solo agente Groq
-import json
 import os
 
 from dotenv import load_dotenv
@@ -76,42 +75,31 @@ agente = create_agent(
 CONFIG = {"configurable": {"thread_id": "profesor"}}
 
 
-def generar_respuesta(peticion_del_profesor: str) -> ContenidoEducativo:
-    """Envía la petición al agente (recuerda lo anterior) y regresa el JSON."""
+def generar_respuesta(peticion_del_profesor: str) -> dict:
+    """Envía la petición al agente (recuerda lo anterior) y regresa un diccionario."""
     resultado = agente.invoke(
         {"messages": [{"role": "user", "content": peticion_del_profesor}]},
         config=CONFIG,
     )
-    return resultado["structured_response"]
+    # model_dump() convierte el objeto al mismo formato del JSON, pero como dict
+    return resultado["structured_response"].model_dump()
 
 
-def mostrar_en_pantalla(contenido: ContenidoEducativo) -> None:
+def mostrar_en_pantalla(contenido: dict) -> None:
     """Imprime el contenido en forma legible para el profesor."""
-    if contenido.estado != "generado":
-        print(contenido.mensaje)
+    if contenido["estado"] != "generado":
+        print(contenido["mensaje"])
         return
-    print(f"{contenido.titulo}  ({contenido.tipo} | {contenido.nivel_educativo})")
-    for i, p in enumerate(contenido.preguntas, 1):
-        print(f"\n{i}. {p.enunciado}")
-        for j, opcion in enumerate(p.opciones):
+    print(f"{contenido['titulo']}  ({contenido['tipo']} | {contenido['nivel_educativo']})")
+    for i, p in enumerate(contenido["preguntas"], 1):
+        print(f"\n{i}. {p['enunciado']}")
+        for j, opcion in enumerate(p["opciones"]):
             print(f"   {'ABCD'[j]}) {opcion}")
-        print(f"   Respuesta: {p.respuesta_correcta}")
-        if p.explicacion:
-            print(f"   Explicación: {p.explicacion}")
-        if p.dificultad:
-            print(f"   Dificultad: {p.dificultad}")
-
-
-def guardar_json(contenido: ContenidoEducativo) -> None:
-    """Guarda el JSON en output/contenido_N.json (numerado, sin sobreescribir)."""
-    os.makedirs("output", exist_ok=True)
-    numero = 1
-    while os.path.exists(f"output/contenido_{numero}.json"):
-        numero += 1
-    ruta = f"output/contenido_{numero}.json"
-    with open(ruta, "w", encoding="utf-8") as archivo:
-        json.dump(contenido.model_dump(), archivo, ensure_ascii=False, indent=2)
-    print(f"\n[guardado en {ruta}]")
+        print(f"   Respuesta: {p['respuesta_correcta']}")
+        if p["explicacion"]:
+            print(f"   Explicación: {p['explicacion']}")
+        if p["dificultad"]:
+            print(f"   Dificultad: {p['dificultad']}")
 
 
 if __name__ == "__main__":
@@ -125,5 +113,3 @@ if __name__ == "__main__":
         contenido = generar_respuesta(peticion)
         print("\nAgente >")
         mostrar_en_pantalla(contenido)
-        if contenido.estado == "generado":
-            guardar_json(contenido)
