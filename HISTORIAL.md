@@ -64,17 +64,12 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-### [Iteración 10] - 12/11/2026
-* **Hecho:**
-  * Integración completa de [agente_profesor.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/agente_profesor.py) con el sistema:
-    * Endpoint en [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) (`POST /api/guided-exercises`) para invocar `generar_respuesta(tipo)`.
-    * Servicio frontend [guidedExercisesService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/guidedExercisesService.js) con validación estricta de conectividad (sin fallbacks offline, 100% generado por IA en vivo).
-    * Modal interactivo [AIGuidedExercisesModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/AIGuidedExercisesModal.jsx) con selección de tipo de preguntas (Opción múltiple, V/F, Completar), resolución paso a paso, validación en vivo y botón permanente "Pedir Pista con IA".
-    * Integración con [SocraticChatModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/SocraticChatModal.jsx) para guiar al estudiante socráticamente sin darle la respuesta directa.
-    * Conexión en [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) a través del botón "Practicar con IA".
-* **Archivos modificados/creados:**
-  * `server.py`
-  * `src/services/guidedExercisesService.js`
-  * `src/components/AIGuidedExercisesModal.jsx`
+### [Iteración 11] - 12/11/2026
+* **Hecho:** 
+  * Se corrigió la superposición de capas (stacking context y z-index) del modal del Chatbot Socrático ([SocraticChatModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/SocraticChatModal.jsx)) elevando su capa a `z-[70]`.
+  * Se reordenó la jerarquía de renderizado en [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) para posicionar el modal del tutor posterior a [AIGuidedExercisesModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/AIGuidedExercisesModal.jsx).
+  * Ahora, al pulsar **"Pedir Pista con IA"** dentro de los ejercicios guiados, el chatbot se despliega directamente por encima del modal de preguntas, permitiendo al estudiante consultar pistas y orientación pedagógica y al cerrarlo volver directamente al ejercicio activo sin recargas ni pérdida de progreso.
+* **Archivos modificados:**
+  * `src/components/SocraticChatModal.jsx`
   * `src/pages/StudentDashboard.jsx`
   * `HISTORIAL.md`

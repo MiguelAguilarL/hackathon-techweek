@@ -2,25 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
-  GraduationCap,
   HelpCircle,
   TrendingUp,
-  Play,
-  Clock,
-  Flame,
-  Star,
   ArrowRight,
-  Check,
   BookOpen,
-  Calculator,
-  MessageSquare,
-  Download,
   Bot,
   Menu,
   X,
-  LogOut,
-  Sparkles,
-  Award
+  LogOut
 } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
 import SocraticChatModal from '../components/SocraticChatModal';
@@ -138,22 +127,6 @@ export default function StudentDashboard() {
               <LayoutDashboard className="w-4 h-4 mr-3" />
               <span>Dashboard</span>
             </Link>
-            <button
-              type="button"
-              onClick={() => alert('Módulo de Cursos disponible próximamente.')}
-              className="w-full flex items-center px-4 py-2.5 rounded-xl text-[#171d19] hover:bg-[#dee4de] transition-colors text-sm font-medium text-left cursor-pointer min-h-[44px]"
-            >
-              <GraduationCap className="w-4 h-4 mr-3 text-slate-500" />
-              <span>Mis Cursos</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => alert('Módulo de Actividades disponible próximamente.')}
-              className="w-full flex items-center px-4 py-2.5 rounded-xl text-[#171d19] hover:bg-[#dee4de] transition-colors text-sm font-medium text-left cursor-pointer min-h-[44px]"
-            >
-              <HelpCircle className="w-4 h-4 mr-3 text-slate-500" />
-              <span>Actividades</span>
-            </button>
             <Link
               to="/resultado"
               onClick={() => setMobileMenuOpen(false)}
@@ -229,48 +202,21 @@ export default function StudentDashboard() {
               </div>
             </section>
 
-            {/* Módulo Activo y Tarjeta de Racha */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Etapa actual */}
-              <div className="lg:col-span-2 rounded-3xl bg-[#006948] text-white p-6 sm:p-8 relative overflow-hidden shadow-md flex flex-col justify-between">
-                <div className="relative z-10">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <span className="px-3 py-1 rounded-lg bg-[#00855d] text-emerald-50 text-xs font-bold uppercase tracking-wide">
-                      Etapa Actual
-                    </span>
-                    <span className="text-[#85f8c4] text-xs font-semibold">• Módulo Activo #4</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-snug">
-                    Identidades Trigonométricas Avanzadas y Despeje de Incógnitas
-                  </h3>
-                  <p className="text-sm text-emerald-50/90 max-w-xl mb-6 leading-relaxed">
-                    Domina la simplificación de expresiones algebraicas trigonométricas aplicadas a problemas de física y geometría jarocha tradicional.
-                  </p>
+            {/* Tema Actual */}
+            <section className="rounded-3xl bg-[#006948] text-white p-6 sm:p-8 relative overflow-hidden shadow-md">
+              <div className="relative z-10">
+                <div className="inline-flex items-center mb-3">
+                  <span className="px-3 py-1 rounded-lg bg-[#00855d] text-emerald-50 text-xs font-bold uppercase tracking-wide">
+                    Tema Actual
+                  </span>
                 </div>
-
-                <div className="relative z-10 flex flex-wrap items-center gap-4 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setChatTopic('Identidades Trigonométricas Avanzadas y Despeje de Incógnitas');
-                      setChatOpen(true);
-                    }}
-                    className="min-h-[44px] px-6 py-2.5 rounded-xl bg-white text-[#171d19] font-bold text-sm hover:bg-slate-100 transition-colors shadow-sm flex items-center space-x-2 cursor-pointer"
-                  >
-                    <Play className="w-4 h-4 text-[#006948] fill-[#006948]" />
-                    <span>Continuar Módulo</span>
-                  </button>
-
-                  <div className="flex items-center space-x-2 text-emerald-100 text-xs font-medium">
-                    <Clock className="w-4 h-4 text-[#85f8c4]" />
-                    <span>Tiempo estimado: 45 min restantes</span>
-                  </div>
-                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-snug">
+                  Ecuaciones Lineales
+                </h3>
+                <p className="text-sm text-emerald-50/90 max-w-2xl leading-relaxed">
+                  Estudio y resolución de ecuaciones de primer grado con una incógnita, aplicando las propiedades de la igualdad y el despeje algebraico para modelar y resolver problemas matemáticos y cotidianos.
+                </p>
               </div>
-
-              {/* Estadísticas de Racha */}
-              
             </section>
 
             {/* Sección de Actividades Disponibles */}
@@ -283,11 +229,11 @@ export default function StudentDashboard() {
                   <h3 className="text-xl font-bold text-[#171d19]">Actividades Disponibles para este Tema</h3>
                 </div>
                 <span className="text-xs text-[#3d4a42] font-medium hidden sm:block">
-                  4 actividades pendientes
+                  3 actividades disponibles
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
                 {/* Actividad 1: Test */}
                 <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-100 hover:shadow-md transition-all flex flex-col justify-between group">
@@ -300,7 +246,7 @@ export default function StudentDashboard() {
                     </span>
                     <h4 className="font-bold text-[#171d19] text-base mb-1">Test Diagnóstico</h4>
                     <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
-                      Evaluación rápida de 5 preguntas sobre identidades fundamentales.
+                      Evaluación rápida de 5 preguntas sobre ecuaciones lineales de primer grado.
                     </p>
                   </div>
                   <button
@@ -324,7 +270,7 @@ export default function StudentDashboard() {
                     </span>
                     <h4 className="font-bold text-[#171d19] text-base mb-1">Flashcards Interactivas</h4>
                     <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
-                      Memoriza y repasa fórmulas clave con tarjetas deslizantes.
+                      Memoriza y repasa fórmulas y conceptos clave con tarjetas estilo NotebookLM.
                     </p>
                   </div>
                   <button
@@ -348,7 +294,7 @@ export default function StudentDashboard() {
                     </span>
                     <h4 className="font-bold text-[#171d19] text-base mb-1">Ejercicios Guiados con IA</h4>
                     <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
-                      Chat interactivo para resolver paso a paso ecuaciones complejas.
+                      Cuestionarios generados en vivo con retroalimentación y tutor socrático.
                     </p>
                   </div>
                   <button
@@ -361,39 +307,7 @@ export default function StudentDashboard() {
                   </button>
                 </div>
 
-                {/* Actividad 4: Reto Semanal */}
-                <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-100 hover:shadow-md transition-all flex flex-col justify-between group">
-                  <div>
-                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center font-bold mb-3 group-hover:bg-[#006948] group-hover:text-white transition-colors">
-                      <Award className="w-6 h-6" />
-                    </div>
-                    <span className="inline-block px-2 py-0.5 rounded bg-[#e9efe9] text-[#3d4a42] text-[10px] font-semibold mb-1.5">
-                      Desafío Semanal
-                    </span>
-                    <h4 className="font-bold text-[#171d19] text-base mb-1">Reto Semanal</h4>
-                    <p className="text-xs text-[#3d4a42] mb-4 line-clamp-2">
-                      Resuelve el problema práctico de trigonometría aplicada y gana insignia.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => alert('Reto semanal cargado')}
-                    className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#006948] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
-                  >
-                    <span>Ver Reto</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
               </div>
-            </section>
-
-            {/* Historial Reciente y Accesos Rápidos */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Lista de Historial */}
-              
-              
             </section>
           </div>
         </main>
@@ -420,20 +334,6 @@ export default function StudentDashboard() {
         </div>
       </aside>
 
-      {/* Modal del Tutor Socrático */}
-      <SocraticChatModal
-        isOpen={chatOpen}
-        onClose={() => setChatOpen(false)}
-        initialTopic={chatTopic}
-        studentProfile={{
-          name: currentUser.name,
-          grade: currentUser.grade,
-          subject: currentUser.subject,
-          level: levelText,
-          city: 'Veracruz'
-        }}
-      />
-
       {/* Modal de Flashcards Interactivas (NotebookLM Style) */}
       <InteractiveFlashcardsModal
         isOpen={flashcardsOpen}
@@ -448,6 +348,20 @@ export default function StudentDashboard() {
         onOpenSocraticChat={(promptText) => {
           setChatTopic(promptText);
           setChatOpen(true);
+        }}
+      />
+
+      {/* Modal del Tutor Socrático (con z-[70] para superponerse limpiamente sobre cualquier otro modal) */}
+      <SocraticChatModal
+        isOpen={chatOpen}
+        onClose={() => setChatOpen(false)}
+        initialTopic={chatTopic}
+        studentProfile={{
+          name: currentUser.name,
+          grade: currentUser.grade,
+          subject: currentUser.subject,
+          level: levelText,
+          city: 'Veracruz'
         }}
       />
 
