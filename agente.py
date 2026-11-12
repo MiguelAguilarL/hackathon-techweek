@@ -1,15 +1,18 @@
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import readline from "node:readline/promises";
-import { fileURLToPath } from "node:url";
+from dataclasses import dataclass
+from pathlib import Path
+# from io import BytesIO
+# from urllib.request import urlopen
 
-import { createAgent, HumanMessage, tool } from "langchain";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { extractText, getDocumentProxy } from "unpdf";
-import * as z from "zod";
+from dotenv import load_dotenv
+from langchain.agents import create_agent
+from langchain.tools import tool, ToolRuntime
+from langchain_core.messages import HumanMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
+from pypdf import PdfReader
 
-const SYSTEM_PROMPT = `
+load_dotenv()
+
+SYSTEM_PROMPT = """
 Eres "Tutor", un tutor personal que acompaña al alumno fuera del aula a través de un chat.
 Tu objetivo NO es dar respuestas: es que el alumno ENTIENDA y APRENDA a pensar por sí mismo.
 
@@ -64,7 +67,7 @@ Después de que responda, corrige y hazle notar la relación entre su confianza 
 - Las dudas conceptuales SÍ las explicas con claridad, con ejemplos sencillos y locales; después
   comprueba que entendió pidiéndole que lo explique con sus palabras o que lo aplique a un caso nuevo.
 
-## 6. Uso de la herramienta \`consultar_material\`
+## 6. Uso de la herramienta `consultar_material`
 - Úsala cuando el alumno mencione sus apuntes, su clase o el material, o cuando empiece un tema nuevo
   y necesites saber cómo lo explicó su profesor.
 - Llámala UNA sola vez por tema; si ya tienes el material en la conversación, reutilízalo.
@@ -76,110 +79,96 @@ Después de que responda, corrige y hazle notar la relación entre su confianza 
 - Mensajes cortos (2 a 5 líneas), fáciles de leer en un chat.
 - Ajusta el nivel de lenguaje a la edad y el nivel del alumno.
 - Nunca lo hagas sentir tonto por equivocarse: el error es parte de aprender.
-`;
+"""
 
-const CARPETA_ACTUAL = path.dirname(fileURLToPath(import.meta.url));
-const RUTA_PDF_DEMO = path.join(CARPETA_ACTUAL, "ecuaciones_lineales.pdf");
-const cacheTexto = new Map();
+RUTA_PDF_DEMO = Path(__file__).parent / "ecuaciones_lineales.pdf"
+cache_texto = {}
 
-function limpiar(texto) {
-  return texto
-    .split("\n")
-    .map((linea) => linea.trim())
-    .filter(Boolean)
-    .join("\n");
-}
 
-async function leerPdf(clave, obtenerBytes) {
-  if (!cacheTexto.has(clave)) {
-    const bytes = await obtenerBytes();
-    const pdf = await getDocumentProxy(new Uint8Array(bytes));
-    const { text } = await extractText(pdf, { mergePages: true });
-    cacheTexto.set(clave, limpiar(text));
-  }
-  return cacheTexto.get(clave);
-}
+@dataclass
+class Contexto:
+    materia: str
 
-async function obtenerMaterialDemo() {
-  if (!existsSync(RUTA_PDF_DEMO)) {
-    return null;
-  }
-  const texto = await leerPdf(RUTA_PDF_DEMO, () => readFile(RUTA_PDF_DEMO));
-  return { nombre: path.basename(RUTA_PDF_DEMO), texto };
-}
 
-// Producción: PDFs que el maestro sube al almacenamiento de la plataforma
-// async function obtenerMaterialPlataforma(materia, tema) {
-//   const url = await buscarUrlMaterial(materia, tema); // consulta a la plataforma por el archivo del tema
-//   if (!url) {
-//     return null;
-//   }
-//   const texto = await leerPdf(url, async () => (await fetch(url)).arrayBuffer());
-//   return { nombre: path.basename(url), texto };
-// }
+def limpiar(texto: str) -> str:
+    lineas = [linea.strip() for linea in texto.splitlines()]
+    return "\n".join(linea for linea in lineas if linea)
 
-const consultarMaterial = tool(
-  async ({ tema }, runtime) => {
-    const materia = runtime.context?.materia ?? "matematicas";
-    console.log(`[tool] consultar_material -> ${materia} / ${tema}`);
 
-    const material = await obtenerMaterialDemo();
-    // const material = await obtenerMaterialPlataforma(materia, tema);
+def leer_pdf(clave: str, abrir) -> str:
+    if clave not in cache_texto:
+        lector = PdfReader(abrir())
+        texto = "\n".join(pagina.extract_text() or "" for pagina in lector.pages)
+        cache_texto[clave] = limpiar(texto)
+    return cache_texto[clave]
 
-    if (!material) {
-      return `No se encontró material de ${materia} sobre "${tema}".`;
-    }
 
-    return `
-MATERIAL DE LA PLATAFORMA (archivo: ${material.nombre})
+def obtener_material_demo() -> dict | None:
+    if not RUTA_PDF_DEMO.exists():
+        return None
+    texto = leer_pdf(str(RUTA_PDF_DEMO), lambda: RUTA_PDF_DEMO)
+    return {"nombre": RUTA_PDF_DEMO.name, "texto": texto}
+
+
+# Producción: PDFs que el maestro sube a Vercel Blob
+# def obtener_material_vercel(materia: str, tema: str) -> dict | None:
+#     url = buscar_url_material(materia, tema)  # URL del PDF en Vercel Blob guardada al subirlo
+#     if url is None:
+#         return None
+#     texto = leer_pdf(url, lambda: BytesIO(urlopen(url).read()))
+#     return {"nombre": Path(url).name, "texto": texto}
+
+
+@tool
+def consultar_material(tema: str, runtime: ToolRuntime[Contexto]) -> str:
+    """Consulta los apuntes y materiales que el profesor subió a la plataforma para la materia del alumno.
+
+    Úsala SOLO cuando:
+    - El alumno mencione sus apuntes, su clase, el material, el PDF o "lo que vimos con el profe".
+    - El alumno empiece a estudiar un tema nuevo y necesites saber cómo se explicó en clase
+      (definiciones, procedimiento, notación y ejercicios que usa su profesor).
+
+    NO la uses cuando:
+    - Ya consultaste ese mismo tema antes en la conversación: reutiliza lo que ya tienes en el historial.
+    - El alumno solo saluda, platica o hace una pregunta general que puedes responder sin el material.
+
+    Args:
+        tema: tema o palabra clave del material a buscar, por ejemplo "ecuaciones lineales".
+    """
+    materia = runtime.context.materia
+    print(f"[tool] consultar_material -> {materia} / {tema}")
+
+    material = obtener_material_demo()
+    # material = obtener_material_vercel(materia, tema)
+
+    if material is None:
+        return f"No se encontró material de {materia} sobre '{tema}'."
+
+    return f"""
+MATERIAL DE LA PLATAFORMA (archivo: {material["nombre"]})
 Uso interno del tutor: alinea tus pistas con la notación y el procedimiento del profesor.
 No le des al alumno las soluciones de los ejercicios; úsalos para practicar con pistas.
 
-${material.texto}
-`;
-  },
-  {
-    name: "consultar_material",
-    description: `Consulta los apuntes y materiales que el profesor subió a la plataforma para la materia del alumno.
+{material["texto"]}
+"""
 
-Úsala SOLO cuando:
-- El alumno mencione sus apuntes, su clase, el material, el PDF o "lo que vimos con el profe".
-- El alumno empiece a estudiar un tema nuevo y necesites saber cómo se explicó en clase
-  (definiciones, procedimiento, notación y ejercicios que usa su profesor).
 
-NO la uses cuando:
-- Ya consultaste ese mismo tema antes en la conversación: reutiliza lo que ya tienes en el historial.
-- El alumno solo saluda, platica o hace una pregunta general que puedes responder sin el material.`,
-    schema: z.object({
-      tema: z.string().describe('Tema o palabra clave del material, por ejemplo "ecuaciones lineales"'),
-    }),
-  }
-);
+llm = ChatGoogleGenerativeAI(model="gemini-3.8-flash")
+agente = create_agent(
+    model=llm,
+    tools=[consultar_material],
+    system_prompt=SYSTEM_PROMPT,
+    context_schema=Contexto,
+)
 
-const llm = new ChatGoogleGenerativeAI({ model: "gemini-2.5-flash" });
-
-export const agente = createAgent({
-  model: llm,
-  tools: [consultarMaterial],
-  systemPrompt: SYSTEM_PROMPT,
-  contextSchema: z.object({ materia: z.string() }),
-});
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const contextoAlumno = { materia: "matematicas" };
-  let historial = [];
-
-  while (true) {
-    const pregunta = await rl.question("Usuario: ");
-    if (pregunta.toLowerCase() === "salir") {
-      break;
-    }
-    historial.push(new HumanMessage(pregunta));
-    const respuesta = await agente.invoke({ messages: historial }, { context: contextoAlumno });
-    historial = respuesta.messages;
-    console.log(`Agente: ${historial.at(-1).text}`);
-  }
-
-  rl.close();
-}
+if __name__ == "__main__":
+    contexto_alumno = Contexto(materia="matematicas")
+    historial = []
+    while True:
+        pregunta = input("Usuario: ")
+        if pregunta.lower() == "salir":
+            break
+        historial.append(HumanMessage(content=pregunta))
+        respuesta = agente.invoke({"messages": historial}, context=contexto_alumno)
+        historial = respuesta["messages"]
+        print(f"Agente: {historial[-1].text}")

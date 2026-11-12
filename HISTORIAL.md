@@ -77,12 +77,11 @@ hackathon-techweek/
 
 ### [Iteración 3] - 11/11/2026
 * **Hecho:**
-  * Se tradujo el agente tutor de Python (`agente.py`) a JavaScript (`agente.js`) con LangChain.js y Gemini 2.5 Flash, para conectarlo más fácil con la PWA en React.
-  * El agente incluye el system prompt socrático (pistas graduales, metacognición con "¿qué tan seguro estás?", contexto de Veracruz y detección de dudas) y la tool `consultar_material`, que lee el texto de `ecuaciones_lineales.pdf` desde el repo con `unpdf`; la carga desde la plataforma quedó comentada.
-  * Se creó `.env` para la API key de Gemini (`GOOGLE_API_KEY`) y se agregó `.env` a `.gitignore` para no subirla al repo.
+  * Se completó el agente tutor en Python (`agente.py`) con LangChain y Gemini 3.8 Flash.
+  * El agente incluye el system prompt socrático (pistas graduales, metacognición con "¿qué tan seguro estás?", contexto de Veracruz y detección de dudas) y la tool `consultar_material`, que lee el texto de `ecuaciones_lineales.pdf` desde el repo con `pypdf`; la carga de PDFs desde Vercel quedó comentada.
+  * Se creó `.env` para la API key de Gemini (`GOOGLE_API_KEY`), que el agente carga con `python-dotenv`, y se agregó `.env` a `.gitignore` para no subirla al repo.
 * **Archivos modificados/creados:**
-  * `agente.js`
+  * `agente.py`
   * `.env` (no versionado)
   * `.gitignore`
-  * `package.json`, `pnpm-lock.yaml` (dependencias: `langchain`, `@langchain/core`, `@langchain/google-genai`, `zod`, `unpdf`)
   * `HISTORIAL.md`
