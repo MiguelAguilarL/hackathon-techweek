@@ -1,8 +1,11 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
+
 * **Objetivo actual:** Implementación del Dashboard del Estudiante en base a `references/dashboard_estudiante.html`, conectando el flujo de resultados con el dashboard con datos reales del usuario y nivel obtenido.
 * **Fase:** Prototipado / Desarrollo UI (Mobile-First & PWA).
+=======
+
 
 ---
 
@@ -34,14 +37,22 @@ hackathon-techweek/
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
+├── .env                     ← NUEVO (no se sube al repo)
+├── agente.js                ← NUEVO (traducción a JavaScript de agente.py)
+├── agente.py
+├── ecuaciones_lineales.pdf
 ├── index.html
 ├── package.json
 ├── pnpm-lock.yaml
 ├── vite.config.js
 ├── AGENTS.md
-├── HISTORIAL.md
-└── README.md
-```
+
+---
+
+## 🛠 Stack definido (módulo docente)
+* Python 3.13 + `langchain` 1.5 + `langchain-groq` + `pydantic` + `python-dotenv` + `pytest`
+* Modelo: **`qwen/qwen3.8-27b`** en Groq (temperatura 0.4)
+* Sin base de datos, sin lectura de archivos, sin RAG (decisión explícita del usuario)
 
 ---
 
@@ -70,3 +81,5 @@ hackathon-techweek/
 * **Próximos pasos sugeridos:**
   * Implementar el chat socrático interactivo que guíe al estudiante paso a paso según el nivel detectado en la evaluación diagnóstica.
   * Implementar la vista del docente para monitorear el progreso del grupo de alumnos.
+=======
+

@@ -12,6 +12,9 @@ Un tutor o herramienta educativa que ayude a aprender de verdad, no a copiar: qu
 
 Estudiantes de secundaria y bachillerato, y sus docentes.
 
+
+---
+
 # BITACORA DE IA:
 
 ### [Iteración 0] - Inicio del Proyecto
