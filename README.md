@@ -130,3 +130,21 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `HISTORIAL.md`
 * **Próximos pasos sugeridos:**
   * Probar conversaciones guiadas de ejercicios matemáticos con el modelo Groq activo.
+
+### [Iteración 6] - 11/11/2026
+* **Hecho:** 
+  * Se implementó el servicio [diagnosticService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/diagnosticService.js) y se actualizó el esquema en [db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js) (tabla `activeDiagnostics`) con persistencia dual en `Dexie.js` y `localStorage`.
+  * Se creó el componente [DiagnosticEditorModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/DiagnosticEditorModal.jsx) para editar o crear exámenes con preguntas de **opción múltiple de 4 incisos** (`a`, `b`, `c`, `d`), asignación de respuesta correcta y validaciones.
+  * Se actualizó [TeacherDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/TeacherDashboard.jsx) para que al pulsar **"Evaluación Diagnóstica"** en el sidebar se despliegue la vista de gestión con:
+    * Vista previa completa de los reactivos vigentes con incisos y respuesta correcta destacada en verde.
+    * Botón **"Modificar Evaluación"** para editar los reactivos existentes.
+    * Botón **"Crear Nueva Evaluación"** para redactar un examen nuevo y reemplazar el que está en curso.
+  * Se actualizó [DiagnosticPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/DiagnosticPage.jsx) para cargar reactivamente la evaluación activa configurada por el docente, recalculando dinámicamente aciertos y progreso.
+  * Se verificó la compilación de producción con `pnpm build` de manera exitosa.
+* **Archivos modificados/creados:**
+  * `src/db/index.js`
+  * `src/services/diagnosticService.js`
+  * `src/components/DiagnosticEditorModal.jsx`
+  * `src/pages/TeacherDashboard.jsx`
+  * `src/pages/DiagnosticPage.jsx`
+  * `HISTORIAL.md`
