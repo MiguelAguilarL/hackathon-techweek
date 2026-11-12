@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import DiagnosticPage from './pages/DiagnosticPage';
 import ResultPage from './pages/ResultPage';
 import StudentDashboard from './pages/StudentDashboard';
+import TeacherDashboard from './pages/TeacherDashboard';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/evaluacion" element={<DiagnosticPage />} />
         <Route path="/resultado" element={<ResultPage />} />
         <Route path="/dashboard" element={<StudentDashboard />} />
+        <Route path="/docente" element={<TeacherDashboard />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

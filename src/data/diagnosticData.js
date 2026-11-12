@@ -1,4 +1,4 @@
-// Preguntas de prueba para evaluación diagnóstica de matemáticas básicas (secundaria/bachillerato)
+// Datos de prueba para evaluación diagnóstica de matemáticas básicas (secundaria/bachillerato)
 export const DIAGNOSTIC_QUESTIONS = [
   {
     id: 1,
@@ -77,3 +77,65 @@ export const MOCK_USER = {
   subject: 'Matemáticas Aplicadas',
   role: 'student'
 };
+
+export const MOCK_TEACHER = {
+  name: 'Prof. Javier Hernández',
+  email: 'profesor.javier@jarocha.edu.mx',
+  password: '123',
+  initials: 'JH',
+  school: 'Secundaria Técnica #26 - Veracruz',
+  subject: 'Matemáticas y Álgebra',
+  group: 'Grupo 4to B • Matemáticas',
+  role: 'teacher'
+};
+
+export const MOCK_STUDENTS_LIST = [
+  {
+    id: 1,
+    name: 'María Rodríguez López',
+    email: 'm.rodriguez@escuela.edu',
+    initials: 'MR',
+    level: 'Avanzado',
+    average: 9.5,
+    algebra: { attempts: '1 int.', status: 'success' },
+    geometria: { attempts: '2 int.', status: 'success' },
+    ecuaciones: { attempts: '1 int.', status: 'success' },
+    trigonometria: { attempts: '1 int.', status: 'success' }
+  },
+  {
+    id: 2,
+    name: 'Juan Carlos Perea',
+    email: 'j.perea@escuela.edu',
+    initials: 'JC',
+    level: 'Intermedio',
+    average: 8.1,
+    algebra: { attempts: '2 int.', status: 'success' },
+    geometria: { attempts: '3 int.', status: 'error' },
+    ecuaciones: { attempts: '1 int.', status: 'success' },
+    trigonometria: { attempts: '-', status: 'none' }
+  },
+  {
+    id: 3,
+    name: 'Ana Gaby Solís',
+    email: 'a.solis@escuela.edu',
+    initials: 'AG',
+    level: 'Avanzado',
+    average: 9.8,
+    algebra: { attempts: '1 int.', status: 'success' },
+    geometria: { attempts: '1 int.', status: 'success' },
+    ecuaciones: { attempts: '1 int.', status: 'success' },
+    trigonometria: { attempts: '1 int.', status: 'success' }
+  },
+  {
+    id: 4,
+    name: 'Luis Miguel Domínguez',
+    email: 'l.dominguez@escuela.edu',
+    initials: 'LM',
+    level: 'Básico',
+    average: 7.2,
+    algebra: { attempts: '3 int.', status: 'success' },
+    geometria: { attempts: '4 int.', status: 'error' },
+    ecuaciones: { attempts: '2 int.', status: 'success' },
+    trigonometria: { attempts: '-', status: 'none' }
+  }
+];

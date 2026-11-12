@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, KeyRound } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, GraduationCap, KeyRound } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
-import { MOCK_USER } from '../data/diagnosticData';
+import { MOCK_USER, MOCK_TEACHER } from '../data/diagnosticData';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,25 +14,64 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState('');
 
   const fillMockCredentials = () => {
-    setEmail(MOCK_USER.email);
-    setPassword(MOCK_USER.password);
+    if (role === 'student') {
+      setEmail(MOCK_USER.email);
+      setPassword(MOCK_USER.password);
+    } else {
+      setEmail(MOCK_TEACHER.email);
+      setPassword(MOCK_TEACHER.password);
+    }
     setErrorMsg('');
+  };
+
+  const handleRoleChange = (newRole) => {
+    setRole(newRole);
+    setErrorMsg('');
+    if (newRole === 'teacher') {
+      setEmail(MOCK_TEACHER.email);
+      setPassword(MOCK_TEACHER.password);
+    } else {
+      setEmail(MOCK_USER.email);
+      setPassword(MOCK_USER.password);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMsg('');
 
-    // Validación de usuario de prueba o acceso
+    if (role === 'teacher') {
+      // Acceso docente
+      if (
+        (email.trim().toLowerCase() === MOCK_TEACHER.email.toLowerCase() && password === MOCK_TEACHER.password) ||
+        (email.trim().length > 0 && password.length >= 3)
+      ) {
+        const teacherData = {
+          name: email.trim().toLowerCase() === MOCK_TEACHER.email.toLowerCase() ? MOCK_TEACHER.name : 'Profesor Jarocho',
+          email: email.trim(),
+          role: 'teacher',
+          initials: email.trim().toLowerCase() === MOCK_TEACHER.email.toLowerCase() ? MOCK_TEACHER.initials : 'PJ',
+          school: MOCK_TEACHER.school,
+          group: MOCK_TEACHER.group
+        };
+        localStorage.setItem('currentTeacher', JSON.stringify(teacherData));
+        navigate('/docente');
+        return;
+      } else {
+        setErrorMsg('Credenciales inválidas para docente.');
+        return;
+      }
+    }
+
+    // Acceso alumno
     if (
       (email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() && password === MOCK_USER.password) ||
       (email.trim().length > 0 && password.length >= 3)
     ) {
-      // Guardamos la sesión
       const userData = {
         name: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.name : 'Estudiante Jarocho',
         email: email.trim(),
-        role,
+        role: 'student',
         initials: email.trim().toLowerCase() === MOCK_USER.email.toLowerCase() ? MOCK_USER.initials : 'EJ',
         grade: MOCK_USER.grade,
         subject: MOCK_USER.subject,
@@ -85,16 +124,15 @@ export default function LoginPage() {
               Aprender a la jarocha
             </h2>
             <p className="text-sm text-slate-500">
-              Bienvenido, inicia sesión para continuar
+              Bienvenido, inicia sesión como {role === 'student' ? 'estudiante' : 'docente'}
             </p>
           </div>
-
 
           {/* Selector de Rol */}
           <div className="relative z-10 grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl">
             <button
               type="button"
-              onClick={() => setRole('student')}
+              onClick={() => handleRoleChange('student')}
               className={`min-h-[44px] py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 role === 'student'
                   ? 'bg-white text-emerald-800 shadow-xs'
@@ -106,15 +144,37 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
-              onClick={() => setRole('teacher')}
+              onClick={() => handleRoleChange('teacher')}
               className={`min-h-[44px] py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 role === 'teacher'
                   ? 'bg-white text-emerald-800 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
+              <GraduationCap className="w-4 h-4" />
               <span>Docente</span>
             </button>
+          </div>
+
+          {/* Tarjeta de ayuda con credenciales de prueba */}
+          <div className="relative z-10 bg-emerald-50 border border-emerald-200/80 rounded-xl p-3.5 text-xs text-emerald-900 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold flex items-center gap-1.5 text-emerald-800">
+                <KeyRound className="w-4 h-4 text-emerald-600" />
+                Cuenta {role === 'student' ? 'de Estudiante' : 'de Docente'}:
+              </span>
+              <button
+                type="button"
+                onClick={fillMockCredentials}
+                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-[11px] transition-colors cursor-pointer"
+              >
+                Autocompletar
+              </button>
+            </div>
+            <div className="font-mono text-[11px] bg-white/80 p-2 rounded-lg border border-emerald-200">
+              <p><strong>Correo:</strong> {role === 'student' ? MOCK_USER.email : MOCK_TEACHER.email}</p>
+              <p><strong>Contraseña:</strong> {role === 'student' ? MOCK_USER.password : MOCK_TEACHER.password}</p>
+            </div>
           </div>
 
           {errorMsg && (
@@ -195,7 +255,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full min-h-[48px] py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-medium rounded-xl shadow-md shadow-emerald-700/20 transition-all flex items-center justify-center space-x-2 cursor-pointer text-sm"
             >
-              <span>Iniciar sesión</span>
+              <span>{role === 'student' ? 'Iniciar sesión (Alumno)' : 'Entrar al Panel Docente'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -204,7 +264,7 @@ export default function LoginPage() {
             <p className="text-xs text-slate-400">
               {role === 'student'
                 ? 'Acceso para estudiantes de secundaria y bachillerato'
-                : 'Panel de seguimiento y diagnóstico para docentes'}
+                : 'Panel de seguimiento grupal y diagnóstico para profesores'}
             </p>
           </div>
         </div>
