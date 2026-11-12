@@ -51,4 +51,3 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-
