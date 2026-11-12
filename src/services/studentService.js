@@ -2,6 +2,7 @@ import { db } from '../db';
 import { MOCK_USER } from '../data/diagnosticData';
 
 const LOCAL_STORAGE_STUDENTS_KEY = 'registeredStudentsList';
+const LOCAL_STORAGE_WARNINGS_KEY = 'academicWarningsList';
 
 function getInitials(name = '') {
   const parts = name.trim().split(' ');
@@ -117,12 +118,26 @@ export async function getAllStudentsWithProgress() {
     console.warn('Error parsing lastEvaluationResult:', e);
   }
 
+  // Obtenemos todas las advertencias académicas registradas
+  let allWarnings = [];
+  try {
+    allWarnings = await getAllAcademicWarnings();
+  } catch (err) {
+    console.warn('Error consultando advertencias académicas:', err);
+  }
+
   // Mapeamos cada estudiante a sus métricas reales
   return students.map((st) => {
     // Buscar evaluaciones de este estudiante
     const studentResults = allResults.filter(
       (r) => r.email?.toLowerCase() === st.email.toLowerCase() || r.userId?.toLowerCase() === st.email.toLowerCase()
     );
+
+    // Buscar advertencias académicas de este estudiante
+    const studentWarnings = allWarnings.filter(
+      (w) => w.studentEmail?.toLowerCase() === st.email.toLowerCase()
+    );
+    const pendingWarnings = studentWarnings.filter((w) => w.status === 'pending');
 
     // Si el estudiante activo es María y tiene resultado en localStorage, lo incluimos
     let latestResult = studentResults.length > 0 ? studentResults[studentResults.length - 1] : null;
@@ -165,6 +180,10 @@ export async function getAllStudentsWithProgress() {
       attemptsCount,
       hasCompletedDiagnostic: Boolean(latestResult),
       latestResult,
+      warnings: studentWarnings,
+      warningsCount: studentWarnings.length,
+      pendingWarningsCount: pendingWarnings.length,
+      hasAcademicAlerts: pendingWarnings.length > 0,
       createdAt: st.createdAt || new Date().toISOString()
     };
   });
@@ -234,4 +253,117 @@ export async function validateStudentCredentials(email, password) {
     (s) => s.email.toLowerCase() === email.trim().toLowerCase() && s.password === password.trim()
   );
   return student || null;
+}
+
+// ==========================================
+// GESTIÓN DE ADVERTENCIAS / INTEGRIDAD ACADÉMICA
+// ==========================================
+
+// Obtiene todas las advertencias registradas (localStorage + Dexie)
+export async function getAllAcademicWarnings() {
+  let list = [];
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_WARNINGS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) list = parsed;
+    }
+  } catch (err) {
+    console.warn('Error leyendo advertencias de localStorage:', err);
+  }
+
+  // Si Dexie tiene la tabla academicWarnings
+  try {
+    if (db.academicWarnings) {
+      const dbWarnings = await db.academicWarnings.toArray();
+      if (dbWarnings.length > 0) {
+        // Unir evitando duplicados por id
+        const ids = new Set(list.map((w) => w.id));
+        for (const dw of dbWarnings) {
+          if (!ids.has(dw.id)) {
+            list.push(dw);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error leyendo de Dexie academicWarnings:', err);
+  }
+
+  // Ordenar por fecha descendente (más recientes primero)
+  return list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+// Registra una nueva advertencia académica
+export async function recordAcademicWarning({
+  studentEmail,
+  studentName,
+  query,
+  reason,
+  replySnippet
+}) {
+  const newWarning = {
+    id: `warn-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    studentEmail: (studentEmail || MOCK_USER.email).toLowerCase(),
+    studentName: studentName || MOCK_USER.name,
+    query: query ? query.trim() : 'Solicitud no especificada',
+    reason: reason || 'Intento de solicitar respuesta directa o resolución automática',
+    replySnippet: replySnippet || '',
+    timestamp: new Date().toISOString(),
+    status: 'pending' // 'pending' | 'resolved'
+  };
+
+  const currentList = await getAllAcademicWarnings();
+  currentList.unshift(newWarning);
+
+  // Guardar en localStorage
+  try {
+    localStorage.setItem(LOCAL_STORAGE_WARNINGS_KEY, JSON.stringify(currentList));
+  } catch (err) {
+    console.warn('Error guardando advertencia en localStorage:', err);
+  }
+
+  // Guardar en Dexie
+  try {
+    if (db.academicWarnings) {
+      await db.academicWarnings.put(newWarning);
+    }
+  } catch (err) {
+    console.warn('Error guardando advertencia en Dexie:', err);
+  }
+
+  return newWarning;
+}
+
+// Obtiene advertencias de un estudiante en específico
+export async function getStudentWarnings(studentEmail) {
+  const all = await getAllAcademicWarnings();
+  return all.filter((w) => w.studentEmail?.toLowerCase() === studentEmail?.toLowerCase());
+}
+
+// Marca una advertencia como revisada/atendida por el docente
+export async function resolveAcademicWarning(warningId) {
+  const all = await getAllAcademicWarnings();
+  const index = all.findIndex((w) => w.id === warningId);
+
+  if (index >= 0) {
+    all[index] = {
+      ...all[index],
+      status: 'resolved',
+      resolvedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem(LOCAL_STORAGE_WARNINGS_KEY, JSON.stringify(all));
+
+    try {
+      if (db.academicWarnings) {
+        await db.academicWarnings.put(all[index]);
+      }
+    } catch (err) {
+      console.warn('Error actualizando advertencia en Dexie:', err);
+    }
+
+    return all[index];
+  }
+  return null;
 }
