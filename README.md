@@ -148,3 +148,19 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `src/pages/TeacherDashboard.jsx`
   * `src/pages/DiagnosticPage.jsx`
   * `HISTORIAL.md`
+
+### [Iteración 7] - 11/11/2026
+* **Hecho:** 
+  * Se creó [agente_flashcards.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/agente_flashcards.py) como agente autónomo en Python que genera flashcards adaptadas pedagógicamente por nivel (**básico**, **intermedio**, **avanzado**) sobre ecuaciones lineales a partir del PDF de la materia.
+  * Se actualizó [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) exponiendo el endpoint `POST /api/flashcards`.
+  * Se implementó el servicio [flashcardsService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/flashcardsService.js) con caché local para disponibilidad offline.
+  * Se diseñó el componente [InteractiveFlashcardsModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/InteractiveFlashcardsModal.jsx) con estética NotebookLM: efecto 3D flip al tocar o presionar espacio, selector de nivel, pistas desplegables, contador de progreso, marcado de dominio y atajos de teclado.
+  * Se conectó la tarjeta **"Flashcards Interactivas"** de [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) para abrir el modal precargando el nivel del diagnóstico del alumno.
+  * Se verificó la compilación de producción con `pnpm build` sin errores.
+* **Archivos modificados/creados:**
+  * `agente_flashcards.py`
+  * `server.py`
+  * `src/services/flashcardsService.js`
+  * `src/components/InteractiveFlashcardsModal.jsx`
+  * `src/pages/StudentDashboard.jsx`
+  * `HISTORIAL.md`

@@ -8,6 +8,9 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 # Importamos directamente desde agente.py sin modificarlo
 from agente import agente, Contexto
 
+# Importamos el generador de flashcards
+from agente_flashcards import generar_flashcards
+
 app = FastAPI(title="Tutor Socrático Jarocho API", version="1.0.0")
 
 # Habilitamos CORS para Vite (localhost:5173 o cualquier host local)
@@ -34,6 +37,10 @@ class ChatRequest(BaseModel):
     messages: List[ChatMessage]
     materia: Optional[str] = "matematicas"
     profile: Optional[StudentProfile] = None
+
+class FlashcardsRequest(BaseModel):
+    nivel: Optional[str] = "intermedio" # "basico" | "intermedio" | "avanzado"
+    tema: Optional[str] = "ecuaciones lineales"
 
 @app.get("/api/health")
 async def health_check():
@@ -74,7 +81,6 @@ async def chat_endpoint(req: ChatRequest):
         ultimo_mensaje = mensajes_resultado[-1]
         contenido = getattr(ultimo_mensaje, "content", "")
         if isinstance(contenido, list):
-            # Algunos modelos retornan listas de bloques de texto
             contenido = "".join(
                 bloque.get("text", "") if isinstance(bloque, dict) else str(bloque)
                 for bloque in contenido
@@ -87,6 +93,19 @@ async def chat_endpoint(req: ChatRequest):
 
     except Exception as e:
         print(f"Error procesando chat: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/flashcards")
+async def flashcards_endpoint(req: FlashcardsRequest):
+    try:
+        cards = generar_flashcards(nivel=req.nivel or "intermedio", tema=req.tema or "ecuaciones lineales")
+        return {
+            "nivel": req.nivel,
+            "tema": req.tema,
+            "flashcards": cards
+        }
+    except Exception as e:
+        print(f"Error generando flashcards: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

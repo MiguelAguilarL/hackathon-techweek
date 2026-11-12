@@ -1,7 +1,7 @@
 # Bitácora del Proyecto: HISTORIAL.md
 
 ## 📌 Estado General
-* **Objetivo actual:** Creación y modificación de la Evaluación Diagnóstica por el docente desde su Dashboard (preguntas de opción múltiple con 4 incisos) y sincronización con el estudiante.
+* **Objetivo actual:** Implementación de Flashcards Interactivas estilo NotebookLM con agente dedicado en Python (`agente_flashcards.py`), adaptadas al nivel del estudiante en ecuaciones lineales.
 * **Fase:** Prototipado / Desarrollo UI e Integración con IA (Mobile-First & PWA).
 
 ---
@@ -22,6 +22,7 @@ hackathon-techweek/
 │   ├── components/
 │   │   ├── ConnectivityBanner.jsx
 │   │   ├── DiagnosticEditorModal.jsx
+│   │   ├── InteractiveFlashcardsModal.jsx
 │   │   └── SocraticChatModal.jsx
 │   ├── data/
 │   │   └── diagnosticData.js
@@ -37,13 +38,16 @@ hackathon-techweek/
 │   │   └── TeacherDashboard.jsx
 │   ├── services/
 │   │   ├── chatService.js
-│   │   └── diagnosticService.js
+│   │   ├── diagnosticService.js
+│   │   └── flashcardsService.js
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
 ├── agente.py                  # Agente Socrático LangChain + Groq (intacto)
+├── agente_flashcards.py       # Agente especializado en Flashcards
 ├── server.py                  # API FastAPI puente
 ├── requirements.txt           # Dependencias de Python
+├── ecuaciones_lineales.pdf    # Material didáctico de apoyo
 ├── index.html
 ├── package.json
 ├── pnpm-lock.yaml
@@ -57,20 +61,18 @@ hackathon-techweek/
 
 ## 📝 Registro de Cambios
 
-### [Iteración 6] - 11/11/2026
+### [Iteración 7] - 11/11/2026
 * **Hecho:** 
-  * Se implementó el servicio [diagnosticService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/diagnosticService.js) y se actualizó el esquema en [db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js) (tabla `activeDiagnostics`) con persistencia dual en `Dexie.js` y `localStorage`.
-  * Se creó el componente [DiagnosticEditorModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/DiagnosticEditorModal.jsx) para editar o crear exámenes con preguntas de **opción múltiple de 4 incisos** (`a`, `b`, `c`, `d`), asignación de respuesta correcta y validaciones.
-  * Se actualizó [TeacherDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/TeacherDashboard.jsx) para que al pulsar **"Evaluación Diagnóstica"** en el sidebar se despliegue la vista de gestión con:
-    * Vista previa completa de los reactivos vigentes con incisos y respuesta correcta destacada en verde.
-    * Botón **"Modificar Evaluación"** para editar los reactivos existentes.
-    * Botón **"Crear Nueva Evaluación"** para redactar un examen nuevo y reemplazar el que está en curso.
-  * Se actualizó [DiagnosticPage.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/DiagnosticPage.jsx) para cargar reactivamente la evaluación activa configurada por el docente, recalculando dinámicamente aciertos y progreso.
-  * Se verificó la compilación de producción con `pnpm build` de manera exitosa.
+  * Se creó [agente_flashcards.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/agente_flashcards.py) como agente autónomo en Python que genera flashcards adaptadas pedagógicamente por nivel (**básico**, **intermedio**, **avanzado**) sobre ecuaciones lineales a partir del PDF de la materia.
+  * Se actualizó [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) exponiendo el endpoint `POST /api/flashcards`.
+  * Se implementó el servicio [flashcardsService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/flashcardsService.js) con caché local para disponibilidad offline.
+  * Se diseñó el componente [InteractiveFlashcardsModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/InteractiveFlashcardsModal.jsx) con estética NotebookLM: efecto 3D flip al tocar o presionar espacio, selector de nivel, pistas desplegables, contador de progreso, marcado de dominio y atajos de teclado.
+  * Se conectó la tarjeta **"Flashcards Interactivas"** de [StudentDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/StudentDashboard.jsx) para abrir el modal precargando el nivel del diagnóstico del alumno.
+  * Se verificó la compilación de producción con `pnpm build` sin errores.
 * **Archivos modificados/creados:**
-  * `src/db/index.js`
-  * `src/services/diagnosticService.js`
-  * `src/components/DiagnosticEditorModal.jsx`
-  * `src/pages/TeacherDashboard.jsx`
-  * `src/pages/DiagnosticPage.jsx`
+  * `agente_flashcards.py`
+  * `server.py`
+  * `src/services/flashcardsService.js`
+  * `src/components/InteractiveFlashcardsModal.jsx`
+  * `src/pages/StudentDashboard.jsx`
   * `HISTORIAL.md`

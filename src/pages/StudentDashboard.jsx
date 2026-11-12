@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
 import SocraticChatModal from '../components/SocraticChatModal';
+import InteractiveFlashcardsModal from '../components/InteractiveFlashcardsModal';
 import { MOCK_USER } from '../data/diagnosticData';
 
 export default function StudentDashboard() {
@@ -31,6 +32,7 @@ export default function StudentDashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatTopic, setChatTopic] = useState('');
+  const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(MOCK_USER);
   const [evaluationResult, setEvaluationResult] = useState(null);
 
@@ -394,7 +396,7 @@ export default function StudentDashboard() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => alert('Abriendo Flashcards offline...')}
+                    onClick={() => setFlashcardsOpen(true)}
                     className="w-full min-h-[44px] py-2 px-3 rounded-xl bg-[#e9efe9] hover:bg-[#006c49] hover:text-white transition-colors text-xs font-bold text-[#171d19] flex items-center justify-center space-x-1 cursor-pointer"
                   >
                     <span>Abrir Tarjetas</span>
@@ -619,6 +621,13 @@ export default function StudentDashboard() {
           level: levelText,
           city: 'Veracruz'
         }}
+      />
+
+      {/* Modal de Flashcards Interactivas (NotebookLM Style) */}
+      <InteractiveFlashcardsModal
+        isOpen={flashcardsOpen}
+        onClose={() => setFlashcardsOpen(false)}
+        initialLevel={levelText}
       />
 
       {/* Footer */}
