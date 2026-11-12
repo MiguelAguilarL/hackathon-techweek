@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Fallback curado local para funcionamiento offline 100% garantizado
 const OFFLINE_FALLBACK = {
