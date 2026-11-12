@@ -95,3 +95,13 @@ hackathon-techweek/
 * **Próximos pasos sugeridos:**
   * Conectar un endpoint en `server.py` (p. ej. `POST /api/cuestionario`) que reciba `{"tipo": ...}` y devuelva el dict, y consumirlo desde el frontend.
   * Mostrar el cuestionario en un modal del dashboard del estudiante.
+
+### [Iteración 9] - 12/11/2026
+* **Hecho:**
+  * `generar_respuesta(tipo)` ahora devuelve el **dict directo** con `contenido.model_dump()` (sin `json.loads` ni texto JSON intermedio).
+  * Se sustituyó `create_agent` por `modelo.with_structured_output(ContenidoEducativo, method="json_mode")`: con tool-calling el modelo fallaba ~50% (`tool_use_failed`); con json_mode pasó **15/15** preguntas correctas.
+  * Se eliminó el guardado en `output/contenido_N.json` (ya no se genera ningún archivo JSON).
+  * Se bajó `temperature` de 0.4 a **0.1** (aprobado por el equipo): con 0.4 el modelo se equivocaba en las cuentas de Verdadero/Falso.
+  * Prompt: regla de verificar cada respuesta antes de asignarla.
+* **Archivos modificados/creados:** `agente_profesor.py`, `HISTORIAL.md`, `README.md`
+* **Próximos pasos sugeridos:** endpoint en `server.py` + modal en el dashboard del estudiante.

@@ -178,3 +178,10 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `README.md`
 * **Próximos pasos sugeridos:**
   * Exponer el agente en `server.py` y consumirlo desde el frontend para abrir el cuestionario desde el dashboard del estudiante.
+
+### [Iteración 9] - 12/11/2026
+* **Hecho:**
+  * `generar_respuesta(tipo)` devuelve el **dict nativo** directamente con `model_dump()` (sin `json.loads` ni archivos JSON).
+  * Se cambió a `with_structured_output(..., method="json_mode")`: con tool-calling fallaba ~50%; con json_mode salió **15/15** preguntas correctas.
+  * `temperature` bajada a 0.1 para evitar errores de cuenta en Verdadero/Falso.
+* **Archivos modificados/creados:** `agente_profesor.py`, `HISTORIAL.md`, `README.md`

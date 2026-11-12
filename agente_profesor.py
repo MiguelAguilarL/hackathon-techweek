@@ -1,10 +1,9 @@
 # Agente de cuestionarios para Aprender a la Jarocha - el estudiante elige el tipo
-import json
 import os
 
 from dotenv import load_dotenv
-from langchain.agents import create_agent
 from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel
 
 # Cargar la clave GROQ_API_KEY desde el archivo .env
@@ -14,11 +13,11 @@ load_dotenv()
 modelo = ChatGroq(
     model="qwen/qwen3.8-27b",
     api_key=os.environ["GROQ_API_KEY"],
-    temperature=0.4,
+    temperature=0.1,  # bajada de 0.4: con 0.4 el modelo se equivocaba en las cuentas
     max_tokens=1000,  # límite del plan on_demand de Groq (no se puede exceder)
 )
 
-# Molde del JSON que el agente debe devolver
+# Molde del cuestionario que el agente debe devolver
 class Pregunta(BaseModel):
     enunciado: str
     opciones: list[str] = []          # ["Verdadero", "Falso"] en V/F
@@ -62,6 +61,8 @@ TIPOS DE CUESTIONARIO (según el valor que recibas):
 
 REGLAS DE SALIDA:
 - Genera SIEMPRE exactamente 5 preguntas (ni 4 ni 6), sin importar nada más.
+- Resuelve cada ecuación tú mismo y comprueba que "respuesta_correcta" sea la correcta
+  antes de responder; nunca marques mal una respuesta correcta.
 - "respuesta_correcta" debe ser idéntico a uno de los textos de "opciones".
 - "estado" = "generado".
 - "tipo" = el tipo de cuestionario que recibiste.
@@ -71,41 +72,23 @@ REGLAS DE SALIDA:
 - "dificultad" = "" (no se usa en la demo).
 - "mensaje" = "".
 - "explicacion" = "" (no se usa en la demo).
-- Responde en español, SOLO con el JSON (sin markdown, sin ``` ni texto adicional),
-  lo más breve posible para que el JSON completo quepa en 1000 tokens.
+- Devuelve el cuestionario en json, en español y lo más breve posible para que quepa
+  en 1000 tokens.
 """
 
-# Un solo agente, sin herramientas y sin memoria: cada cuestionario es independiente
-agente = create_agent(
-    model=modelo,
-    system_prompt=INSTRUCCIONES,
-)
+# Un solo agente, sin herramientas y sin memoria: cada cuestionario es independiente.
+# El modelo devuelve el objeto ya validado (salida estructurada de Groq).
+agente = modelo.with_structured_output(ContenidoEducativo, method="json_mode")
 
 
 def generar_respuesta(tipo_cuestionario: str) -> dict:
     """Envía el tipo elegido por el estudiante y regresa el cuestionario como dict."""
-    resultado = agente.invoke(
-        {"messages": [{"role": "user", "content": f"Tipo de cuestionario: {tipo_cuestionario}"}]},
-    )
-    texto = resultado["messages"][-1].content
-    if isinstance(texto, list):  # bloques de contenido
-        texto = "".join(
-            bloque.get("text", "") if isinstance(bloque, dict) else str(bloque)
-            for bloque in texto
-        )
-    texto = texto.strip()
-    if texto.startswith("```"):  # limpia bloque markdown si viniera envuelto
-        lineas = texto.splitlines()
-        if lineas[0].startswith("```"):
-            lineas = lineas[1:]
-        if lineas and lineas[-1].startswith("```"):
-            lineas = lineas[:-1]
-        texto = "\n".join(lineas).strip()
-
-    # json.loads convierte el JSON en un dict nativo de Python
-    datos = json.loads(texto)
-    # la validación garantiza la misma estructura del proyecto
-    return ContenidoEducativo.model_validate(datos).model_dump()
+    contenido = agente.invoke([
+        SystemMessage(content=INSTRUCCIONES),
+        HumanMessage(content=f"Tipo de cuestionario: {tipo_cuestionario}"),
+    ])
+    # model_dump() convierte el objeto en un dict nativo de Python
+    return contenido.model_dump()
 
 
 def mostrar_en_pantalla(contenido: dict) -> None:
@@ -123,18 +106,6 @@ def mostrar_en_pantalla(contenido: dict) -> None:
             print(f"   Explicación: {p['explicacion']}")
 
 
-def guardar_json(contenido: dict) -> None:
-    """Guarda el diccionario en output/contenido_N.json (numerado, sin sobreescribir)."""
-    os.makedirs("output", exist_ok=True)
-    numero = 1
-    while os.path.exists(f"output/contenido_{numero}.json"):
-        numero += 1
-    ruta = f"output/contenido_{numero}.json"
-    with open(ruta, "w", encoding="utf-8") as archivo:
-        json.dump(contenido, archivo, ensure_ascii=False, indent=2)
-    print(f"\n[guardado en {ruta}]")
-
-
 if __name__ == "__main__":
     print("Aprender a la Jarocha - Cuestionarios (escribe 'salir' para terminar)")
     while True:
@@ -148,5 +119,3 @@ if __name__ == "__main__":
         contenido = generar_respuesta(tipo)
         print("\nAgente >")
         mostrar_en_pantalla(contenido)
-        if contenido["estado"] == "generado":
-            guardar_json(contenido)
