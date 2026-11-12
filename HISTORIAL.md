@@ -2,7 +2,7 @@
 
 ## 📌 Estado General
 * **Objetivo actual:** Agente docente único (consola) que genera evaluaciones diagnósticas y actividades con Groq.
-* **Fase:** MVP funcional en consola con memoria de conversación — pendiente decidir siguiente funcionalidad.
+* **Fase:** MVP con memoria y salida JSON — pendiente integración con la web del compañero.
 
 ---
 
@@ -86,3 +86,18 @@
   * La memoria vive en RAM: se pierde al cerrar la consola.
   * El historial crece en cada turno (más tokens de entrada con el tiempo).
 * **Próximos pasos:** decidir siguiente funcionalidad con el usuario.
+
+### [Iteración 6] - 11/11/2026 — SALIDA JSON para la web
+* **Hecho:**
+  * Modelos Pydantic `Pregunta` y `ContenidoEducativo` + `response_format` en `create_agent` → el agente devuelve un JSON validado.
+  * `mostrar_en_pantalla()` imprime el contenido legible para el profesor (como antes).
+  * `guardar_json()` escribe `output/contenido_N.json` numerado sin sobreescribir (cada petición = un JSON nuevo para "subir" a la plataforma).
+  * La web podrá mostrar el ejercicio al alumno (modo Kahoot con `opciones[]`) y calificar con `respuesta_correcta`; la calificación NO es tarea del agente.
+  * `INSTRUCCIONES`: si faltan datos → `estado="necesita_aclaracion"` (no guarda JSON); explicaciones máximo 2 oraciones (límite 1000 tokens de Groq).
+  * Pruebas OK: 2 actividades → `contenido_1.json` y `contenido_2.json`; petición sin datos → pidió aclaración sin guardar.
+* **Archivos modificados:** `agente_profesor.py`
+* **Commits:** `feat: agregar salida JSON con Pydantic`
+* **Limitaciones conocidas:**
+  * Aviso cosmético de langgraph ("unregistered type __main__.ContenidoEducativo") en la 2ª petición; funciona bien, no se bloquea aún.
+  * 1000 tokens de salida por minuto → evaluaciones muy largas pueden truncarse.
+* **Próximos pasos:** integración con la web del compañero (el JSON de `output/` es el contrato).
