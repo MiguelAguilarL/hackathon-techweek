@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, GraduationCap, KeyRound } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 import ConnectivityBanner from '../components/ConnectivityBanner';
 import { MOCK_USER, MOCK_TEACHER } from '../data/diagnosticData';
 import { validateStudentCredentials } from '../services/studentService';
@@ -14,27 +14,11 @@ export default function LoginPage() {
   const [role, setRole] = useState('student'); // 'student' | 'teacher'
   const [errorMsg, setErrorMsg] = useState('');
 
-  const fillMockCredentials = () => {
-    if (role === 'student') {
-      setEmail(MOCK_USER.email);
-      setPassword(MOCK_USER.password);
-    } else {
-      setEmail(MOCK_TEACHER.email);
-      setPassword(MOCK_TEACHER.password);
-    }
-    setErrorMsg('');
-  };
-
   const handleRoleChange = (newRole) => {
     setRole(newRole);
     setErrorMsg('');
-    if (newRole === 'teacher') {
-      setEmail(MOCK_TEACHER.email);
-      setPassword(MOCK_TEACHER.password);
-    } else {
-      setEmail(MOCK_USER.email);
-      setPassword(MOCK_USER.password);
-    }
+    setEmail('');
+    setPassword('');
   };
 
   const handleSubmit = async (e) => {
@@ -175,27 +159,6 @@ export default function LoginPage() {
               <GraduationCap className="w-4 h-4" />
               <span>Docente</span>
             </button>
-          </div>
-
-          {/* Tarjeta de ayuda con credenciales de prueba */}
-          <div className="relative z-10 bg-emerald-50 border border-emerald-200/80 rounded-xl p-3.5 text-xs text-emerald-900 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold flex items-center gap-1.5 text-emerald-800">
-                <KeyRound className="w-4 h-4 text-emerald-600" />
-                Cuenta {role === 'student' ? 'de Estudiante' : 'de Docente'}:
-              </span>
-              <button
-                type="button"
-                onClick={fillMockCredentials}
-                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-[11px] transition-colors cursor-pointer"
-              >
-                Autocompletar
-              </button>
-            </div>
-            <div className="font-mono text-[11px] bg-white/80 p-2 rounded-lg border border-emerald-200">
-              <p><strong>Correo:</strong> {role === 'student' ? MOCK_USER.email : MOCK_TEACHER.email}</p>
-              <p><strong>Contraseña:</strong> {role === 'student' ? MOCK_USER.password : MOCK_TEACHER.password}</p>
-            </div>
           </div>
 
           {errorMsg && (
