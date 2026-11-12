@@ -320,6 +320,7 @@ export default function SocraticChatModal({ isOpen, onClose, initialTopic, stude
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder="Escribe tu duda o lo que has intentado..."
               disabled={isLoading}
               className="flex-grow min-h-[48px] px-4 py-2.5 bg-[#eff5ef] rounded-xl text-sm text-[#171d19] placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#006948]/20 border-transparent transition-all"

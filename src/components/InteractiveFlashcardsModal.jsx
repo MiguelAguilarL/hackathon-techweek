@@ -17,8 +17,6 @@ import {
 import { fetchFlashcards } from '../services/flashcardsService';
 
 export default function InteractiveFlashcardsModal({ isOpen, onClose, initialLevel = 'intermedio' }) {
-  if (!isOpen) return null;
-
   // Normalizar nivel inicial
   const getInitialKey = (lvl) => {
     const s = String(lvl || '').toLowerCase();
@@ -37,6 +35,7 @@ export default function InteractiveFlashcardsModal({ isOpen, onClose, initialLev
 
   // Cargar tarjetas al cambiar de nivel
   useEffect(() => {
+    if (!isOpen) return;
     let isMounted = true;
     setIsLoading(true);
     setIsFlipped(false);
@@ -53,11 +52,24 @@ export default function InteractiveFlashcardsModal({ isOpen, onClose, initialLev
     return () => {
       isMounted = false;
     };
-  }, [selectedLevel]);
+  }, [isOpen, selectedLevel]);
 
   // Manejo de atajos de teclado (flechas y barra espaciadora)
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (e) => {
+      // Ignorar completamente si el foco está en un input, textarea o elemento editable
+      const targetTag = e.target?.tagName?.toLowerCase();
+      if (
+        targetTag === 'input' ||
+        targetTag === 'textarea' ||
+        e.target?.isContentEditable ||
+        e.target?.closest?.('input, textarea, form')
+      ) {
+        return;
+      }
+
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
         setIsFlipped((prev) => !prev);
@@ -70,7 +82,7 @@ export default function InteractiveFlashcardsModal({ isOpen, onClose, initialLev
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, cards.length]);
+  }, [isOpen, currentIndex, cards.length]);
 
   const handleNext = () => {
     if (cards.length === 0) return;
@@ -114,6 +126,8 @@ export default function InteractiveFlashcardsModal({ isOpen, onClose, initialLev
 
   const isCurrentMastered = masteredIds.has(currentCard.id);
   const progressPct = cards.length > 0 ? Math.round(((currentIndex + 1) / cards.length) * 100) : 0;
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
