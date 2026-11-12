@@ -266,3 +266,32 @@ Estudiantes de secundaria y bachillerato, y sus docentes.
   * `agente.py`
   * `README.md`
   * `HISTORIAL.md`
+
+
+### [Iteración 15] - 12/11/2026
+* **Hecho:**
+  * **Sistema de Integridad Académica y Alertas de Copia al Docente:**
+    * Integración del valor booleano `intento_copiar` de `agente.py` en [server.py](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/server.py) (`POST /api/chat`), con emisión del objeto estructurado `warning`.
+    * Creación de la tabla `academicWarnings` en el esquema `db.version(4)` de `Dexie.js` ([src/db/index.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/db/index.js)) y funciones de gestión en [src/services/studentService.js](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/services/studentService.js).
+    * Notificación en tiempo real y aviso de integridad en el chat del estudiante ([src/components/SocraticChatModal.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/components/SocraticChatModal.jsx)).
+    * Supervisión en el panel docente ([src/pages/TeacherDashboard.jsx](file:///C:/Users/Dell%20Latitude%207420/Desktop/hackathon-techweek/src/pages/TeacherDashboard.jsx)): banner global de avisos, columna *"Integridad IA"* en la tabla de alumnos (`⚠️ 1 aviso`), expediente de detalle con el mensaje exacto enviado por el alumno y botón *"Marcar como Revisada"*.
+  * **Actualización de Identidad Visual a Jarocha AI:**
+    * Renombrado transversal del proyecto a **Jarocha AI** en Login, Dashboard del Estudiante, Panel Docente, Evaluación Diagnóstica, Resultado, `index.html` y manifiesto PWA en `vite.config.js`.
+  * **Preparación para Producción en la Nube:**
+    * Creación de `vercel.json` con reescritura de rutas SPA para despliegue sin errores 404.
+    * Creación de `render.yaml` y parametrización de `VITE_API_URL` en servicios frontend.
+* **Archivos modificados/creados:**
+  * `server.py`
+  * `src/db/index.js`
+  * `src/services/studentService.js`
+  * `src/components/SocraticChatModal.jsx`
+  * `src/pages/TeacherDashboard.jsx`
+  * `src/pages/StudentDashboard.jsx`
+  * `src/pages/LoginPage.jsx`
+  * `src/pages/DiagnosticPage.jsx`
+  * `src/pages/ResultPage.jsx`
+  * `index.html`
+  * `vite.config.js`
+  * `vercel.json`
+  * `render.yaml`
+  * `README.md`

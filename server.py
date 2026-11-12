@@ -8,7 +8,7 @@ from typing import List, Optional
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 # Importamos directamente desde agente.py sin modificarlo
-from agente import agente, Contexto
+from agente import agente, Contexto, responder, leer_respuesta
 
 # Importamos el generador de flashcards
 from agente_flashcards import generar_flashcards
@@ -104,19 +104,24 @@ async def chat_endpoint(req: ChatRequest):
             else:
                 historial.append(AIMessage(content=msg.content))
 
-        respuesta = agente.invoke({"messages": historial}, context=contexto_alumno)
-        mensajes_resultado = respuesta.get("messages", [])
+        explicacion = ""
+        intento_copiar = False
 
-        if not mensajes_resultado:
-            raise HTTPException(status_code=500, detail="No se recibió respuesta del agente.")
-
-        ultimo_mensaje = mensajes_resultado[-1]
-        contenido = getattr(ultimo_mensaje, "content", "")
-        if isinstance(contenido, list):
-            contenido = "".join(
-                bloque.get("text", "") if isinstance(bloque, dict) else str(bloque)
-                for bloque in contenido
-            )
+        try:
+            explicacion, intento_copiar = responder(historial, contexto_alumno)
+        except Exception as err:
+            print(f"Aviso usando responder(): {err}. Usando fallback de invocación directa.")
+            respuesta = agente.invoke({"messages": historial}, context=contexto_alumno)
+            mensajes_resultado = respuesta.get("messages", [])
+            if not mensajes_resultado:
+                raise HTTPException(status_code=500, detail="No se recibió respuesta del agente.")
+            ultimo_mensaje = mensajes_resultado[-1]
+            contenido_raw = getattr(ultimo_mensaje, "text", getattr(ultimo_mensaje, "content", ""))
+            try:
+                explicacion, intento_copiar = leer_respuesta(str(contenido_raw))
+            except Exception:
+                explicacion = str(contenido_raw)
+                intento_copiar = False
 
         ultimo_texto_usuario = ""
         for msg in reversed(req.messages):
@@ -124,11 +129,25 @@ async def chat_endpoint(req: ChatRequest):
                 ultimo_texto_usuario = msg.content
                 break
 
-        advertencia = detectar_intento_copia(ultimo_texto_usuario)
+        alerta_heuristica = detectar_intento_copia(ultimo_texto_usuario)
+
+        advertencia = None
+        if intento_copiar or (alerta_heuristica and alerta_heuristica.get("detected")):
+            razon = "El agente IA detectó un intento de solicitar la respuesta directa o resolución automática"
+            if alerta_heuristica and alerta_heuristica.get("reason"):
+                razon = alerta_heuristica["reason"]
+
+            advertencia = {
+                "detected": True,
+                "reason": razon,
+                "query": ultimo_texto_usuario.strip() or "Solicitud directa de respuesta",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
 
         return {
-            "reply": str(contenido),
+            "reply": str(explicacion),
             "role": "assistant",
+            "intento_copiar": bool(intento_copiar),
             "warning": advertencia
         }
 

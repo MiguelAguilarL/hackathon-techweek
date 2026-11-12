@@ -109,14 +109,15 @@ export default function SocraticChatModal({ isOpen, onClose, initialTopic, stude
         profile: studentProfile
       });
 
-      // Si el backend detectó intento de copia o solicitud directa de respuesta
-      if (res?.warning?.detected) {
+      // Si el agente detectó intento de copia (intento_copiar=True o regla de integridad)
+      const cheatingDetected = Boolean(res?.warning?.detected || res?.intento_copiar);
+      if (cheatingDetected) {
         try {
           await recordAcademicWarning({
             studentEmail: studentProfile?.email,
             studentName: studentProfile?.name,
-            query: res.warning.query || text,
-            reason: res.warning.reason,
+            query: res?.warning?.query || text,
+            reason: res?.warning?.reason || 'El agente IA detectó un intento de solicitar la respuesta directa o resolución automática',
             replySnippet: res.reply
           });
         } catch (warnErr) {
@@ -128,7 +129,7 @@ export default function SocraticChatModal({ isOpen, onClose, initialTopic, stude
         id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: res.reply,
-        hasAcademicWarning: Boolean(res?.warning?.detected),
+        hasAcademicWarning: cheatingDetected,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
