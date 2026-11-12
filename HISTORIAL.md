@@ -2,7 +2,7 @@
 
 ## 📌 Estado General
 * **Objetivo actual:** Agente docente único (consola) que genera evaluaciones diagnósticas y actividades con Groq.
-* **Fase:** MVP con memoria y salida JSON — pendiente integración con la web del compañero.
+* **Fase:** MVP con memoria y salida como diccionario Python — pendiente integración con la web del compañero.
 
 ---
 
@@ -101,3 +101,15 @@
   * Aviso cosmético de langgraph ("unregistered type __main__.ContenidoEducativo") en la 2ª petición; funciona bien, no se bloquea aún.
   * 1000 tokens de salida por minuto → evaluaciones muy largas pueden truncarse.
 * **Próximos pasos:** integración con la web del compañero (el JSON de `output/` es el contrato).
+
+### [Iteración 7] - 11/11/2026 — SALIDA como diccionario (fin de archivos JSON)
+* **Hecho:**
+  * Cambio de plan: la web ya no lee archivos de `output/`.
+  * `generar_respuesta()` ahora regresa un **dict de Python** con `model_dump()` (mismo formato que el JSON: `estado`, `tipo`, `titulo`, `preguntas[]`...).
+  * Eliminada `guardar_json()` y el `import json`; no se crean archivos.
+  * `mostrar_en_pantalla()` adaptada a acceso por corchetes (`contenido["titulo"]`); sigue imprimiendo el texto legible para el profesor.
+  * Prueba OK: actividad de 2 preguntas en pantalla, sin archivos nuevos.
+* **Archivos modificados:** `agente_profesor.py`
+* **Commits:** `refactor: devolver diccionario en lugar de guardar JSON`
+* **Contrato para la web:** `resultado = generar_respuesta("petición del profesor")` → dict listo para usar.
+* **Próximos pasos:** integración con la web del compañero.
